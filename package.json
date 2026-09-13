@@ -1,0 +1,22 @@
+{
+  "name": "petsocietywebsite",
+  "version": "1.0.0",
+  "description": "Pet Society — Luxury Spa & Pet Nutrition",
+  "main": "index.html",
+  "scripts": {
+    "dev": "serve .",
+    "start": "serve ."
+  },
+  "keywords": [
+    "pet-care",
+    "spa",
+    "grooming",
+    "ecommerce",
+    "website"
+  ],
+  "author": "Varun Kshatriya",
+  "license": "MIT",
+  "devDependencies": {
+    "serve": "^14.2.4"
+  }
+}
