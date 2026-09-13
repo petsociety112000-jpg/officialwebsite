@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Pet Society — Premium grooming spa & pet nutrition store. Cage-free luxury care, certified groomers, and curated pet products delivered with love.">
+  <meta property="og:title" content="Pet Society | Premium Grooming Spa & Pet Store">
+  <meta property="og:description" content="Experience premium cage-free grooming spa and shop curated pet nutrition & accessories.">
+  <title>Pet Society | Premium Grooming Spa & Pet Store</title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/responsive.css">
+
+  <!-- Prevent FOUC on reveal elements: mark as JS-pending -->
+  <style>
+    .reveal, .reveal-left, .reveal-right { opacity:1; transform:none; }
+    .js-loaded .reveal { opacity:0; transform:translateY(28px); }
+    .js-loaded .reveal-left { opacity:0; transform:translateX(-36px); }
+    .js-loaded .reveal-right { opacity:0; transform:translateX(36px); }
+    .js-loaded .reveal.visible, .js-loaded .reveal-left.visible, .js-loaded .reveal-right.visible { opacity:1; transform:none; }
+  </style>
+</head>
+<body>
+
+<!-- ============================================================
+     OVERLAY BACKDROP
+     ============================================================ -->
+<div id="overlay" class="overlay"></div>
+
+<!-- ============================================================
+     TOAST CONTAINER
+     ============================================================ -->
+<div id="toast-container" aria-live="polite"></div>
+
+
+<!-- ============================================================
+     HEADER
+     ============================================================ -->
+<header id="header">
+  <div class="container">
+    <div class="header-inner">
+
+      <!-- Logo -->
+      <a href="#" class="logo" id="logo-home" aria-label="Pet Society Home">
+        <div class="logo-icon">🐾</div>
+        <div class="logo-text">
+          <span>Pet Society</span>
+          <span>Premium Pet Care</span>
+        </div>
+      </a>
+
+      <!-- Desktop Nav Links -->
+      <nav class="nav-links" id="desktop-nav" aria-label="Main navigation">
+        <a href="#store"        class="nav-link">🛍️ Store</a>
+        <a href="#spa"          class="nav-link">Spa & Grooming</a>
+        <a href="#about"        class="nav-link">About</a>
+        <a href="#trust"        class="nav-link">Why Us</a>
+        <a href="#team"         class="nav-link">Team</a>
+        <a href="#testimonials" class="nav-link">Reviews</a>
+        <a href="#footer"       class="nav-link">Contact</a>
+      </nav>
+
+      <!-- Nav Action Buttons -->
+      <div class="nav-actions">
+        <button class="nav-icon-btn" id="wishlist-trigger" aria-label="Wishlist">
+          ♡
+          <span class="badge-counter" id="wishlist-badge" style="display:none">0</span>
+        </button>
+        <button class="nav-icon-btn" id="cart-trigger" aria-label="Shopping cart">
+          🛒
+          <span class="badge-counter" id="cart-badge" style="display:none">0</span>
+        </button>
+        <button class="btn btn-primary btn-sm nav-book-btn" id="book-trigger" data-action="open-booking">
+          Book Spa
+        </button>
+        <button class="hamburger" id="hamburger" aria-label="Open menu">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+
+    </div>
+  </div>
+</header>
+
+
+<!-- ============================================================
+     MOBILE NAV DRAWER
+     ============================================================ -->
+<nav id="mobile-nav" aria-label="Mobile navigation">
+  <div class="mobile-nav-header">
+    <a href="#" class="logo">
+      <div class="logo-icon">🐾</div>
+      <div class="logo-text">
+        <span>Pet Society</span>
+        <span>Premium Pet Care</span>
+      </div>
+    </a>
+    <button class="mobile-nav-close" id="mobile-nav-close" aria-label="Close menu">✕</button>
+  </div>
+  <div class="mobile-nav-links">
+    <a href="#store"        class="mobile-nav-link">🛍️ Store</a>
+    <a href="#spa"          class="mobile-nav-link">✂️ Spa & Grooming</a>
+    <a href="#about"        class="mobile-nav-link">🏠 About Us</a>
+    <a href="#trust"        class="mobile-nav-link">🏅 Why Us</a>
+    <a href="#team"         class="mobile-nav-link">👥 Our Team</a>
+    <a href="#testimonials" class="mobile-nav-link">⭐ Reviews</a>
+    <a href="#footer"       class="mobile-nav-link">📍 Contact</a>
+  </div>
+  <div class="mobile-nav-footer">
+    <button class="btn btn-primary" data-action="open-booking" data-close-mobile="true">
+      📅 Book Spa Appointment
+    </button>
+    <button class="btn btn-secondary" id="mobile-cart-open" data-action="open-cart" data-close-mobile="true">
+      🛒 View Cart
+    </button>
+  </div>
+</nav>
+
+
+<!-- ============================================================
+     SECTION 1: PRODUCT STORE (1st page — Products Only)
+     ============================================================ -->
+<section id="store" class="store-first-page" aria-label="Pet Society Store">
+  <!-- Offer strip banner -->
+  <div class="store-offer-strip">
+    <span class="marquee-text">
+      🎉 Free delivery on orders above ₹1,500 &nbsp;|&nbsp; 🐾 10% OFF your first order — Use code: PETLOVE10 &nbsp;|&nbsp; ⚡ Same-day delivery in Bengaluru &nbsp;|&nbsp; 🛡️ 100% Vet-Approved Products &nbsp;|&nbsp;
+    </span>
+  </div>
+
+  <!-- Sticky category icon bar (Zepto-style) -->
+  <div class="category-icons-wrap" id="category-icons-wrap">
+    <div class="category-icons-row" id="category-icons-row">
+      <!-- Rendered dynamically by JS -->
+    </div>
+  </div>
+
+  <div class="container" style="padding-top: var(--space-4); padding-bottom: var(--space-12);">
+    <!-- Store Header -->
+    <div class="store-header" style="text-align: center; margin-bottom: var(--space-4);">
+      <div class="section-eyebrow" style="justify-content:center;">🛍️ Express Pet Store</div>
+      <h1 class="section-title" style="font-size: clamp(1.8rem, 3vw, 2.5rem); margin-bottom: var(--space-1);">
+        Pet Society Store
+      </h1>
+      <p class="section-subtitle" style="margin: 0.25rem auto 0; font-size: var(--text-sm);">
+        ⚡ Vet-approved nutrition, treats, grooming essentials & accessories delivered to your doorstep.
+      </p>
+    </div>
+
+    <!-- Section label -->
+    <div class="store-section-label">
+      <span class="store-section-label-text" id="store-section-label-text">🛍️ All Products</span>
+      <div class="store-section-label-line"></div>
+      <span style="font-size:var(--text-sm);color:var(--text-muted);font-weight:600;" id="store-product-count">8 items</span>
+    </div>
+
+    <!-- Product Grid -->
+    <div class="product-grid" id="product-grid" aria-label="Product listing"></div>
+
+    <!-- Filter pills (hidden, kept for JS compatibility) -->
+    <div class="filter-pills" id="filter-pills" role="group" aria-label="Product category filters" style="display:none;"></div>
+  </div>
+</section>
+
+
+<!-- ============================================================
+     SECTION 2: SPA & SALON SPOTLIGHT BANNER
+     ============================================================ -->
+<section id="hero" class="hero-horizontal" style="border-top: 2px solid var(--color-slate-200);" aria-label="Spa and grooming showcase">
+  <!-- Floating Paw Decorations -->
+  <span class="paw-decor hero-paw-1" aria-hidden="true">🐾</span>
+  <span class="paw-decor hero-paw-2" aria-hidden="true">🐾</span>
+  <span class="paw-decor hero-paw-3" aria-hidden="true">🐾</span>
+
+  <div class="container" style="height: 100%;">
+    <div class="hero-inner">
+
+      <!-- Hero Text Content -->
+      <div class="hero-content">
+        <div class="hero-badge">
+          <span class="hero-badge-dot"></span>
+          Cage-Free Spa & Grooming Lounge
+        </div>
+
+        <h2 class="hero-title" style="font-size: clamp(1.8rem, 3.2vw, 2.8rem);">
+          Premium Care For Your Pet's <span class="accent">Happiest Life</span>
+        </h2>
+
+        <p class="hero-desc">
+          Certified loving groomers, warm hydrobaths, organic aromatherapy, and stress-free handling — designed around your pet's comfort.
+        </p>
+
+        <div class="hero-actions">
+          <button class="btn btn-primary btn-sm" id="hero-book-spa" data-action="open-booking">
+            📅 Book Spa Appointment
+          </button>
+          <a href="#spa" class="btn btn-secondary btn-sm">
+            ✂️ View Spa Packages
+          </a>
+        </div>
+
+        <div class="hero-stats">
+          <div>
+            <div class="hero-stat-num">
+              <span data-counter="1200" data-suffix="+">0+</span>
+            </div>
+            <div class="hero-stat-label">Happy Pets</div>
+          </div>
+          <div>
+            <div class="hero-stat-num">
+              <span data-counter="12" data-suffix="+">0+</span>
+            </div>
+            <div class="hero-stat-label">Years Exp.</div>
+          </div>
+          <div>
+            <div class="hero-stat-num">
+              <span data-counter="98" data-suffix="%">0%</span>
+            </div>
+            <div class="hero-stat-label">5★ Reviews</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Hero Image -->
+      <div class="hero-media">
+        <!-- Floating card — Certified -->
+        <div class="hero-float-card hero-float-card--tl">
+          <div class="hero-float-card-icon" style="background:var(--color-teal-pale)">🏅</div>
+          <div>
+            <div class="hero-float-card-label">Certified</div>
+            <div class="hero-float-card-value">NDGA Groomers</div>
+          </div>
+        </div>
+
+        <div class="hero-img-frame">
+          <img src="assets/images/hero-groomer.jpg"
+               alt="Professional groomer brushing a fluffy white Samoyed dog in a premium salon"
+               loading="lazy">
+        </div>
+
+        <!-- Floating card — Rating -->
+        <div class="hero-float-card hero-float-card--br">
+          <div class="hero-float-card-icon" style="background:var(--color-fuchsia-pale)">⭐</div>
+          <div>
+            <div class="hero-float-card-label">Average Rating</div>
+            <div class="hero-float-card-value">4.9 / 5.0</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+
+
+
+
+<!-- ============================================================
+     SECTION 3: ABOUT US
+     ============================================================ -->
+<section id="about" class="section-pad" aria-label="About Pet Society">
+  <div class="container">
+    <div class="about-grid">
+
+      <!-- Image Collage -->
+      <div class="about-img-collage reveal-left">
+        <div class="about-img-main">
+          <img src="assets/images/hero-groomer.jpg"
+               alt="Our premium pet salon interior"
+               style="object-position: center top">
+        </div>
+        <div class="about-img-badge">
+          <div class="big-num">12<span style="font-size:1.5rem">+</span></div>
+          <div class="label">Years of<br>Pet Care</div>
+        </div>
+      </div>
+
+      <!-- Text Content -->
+      <div class="about-content reveal-right">
+        <div class="section-eyebrow">🐾 About Pet Society</div>
+        <h2 class="section-title section-title--teal">
+          The Difference<br>One Pet Shop Can Make
+        </h2>
+        <p class="section-subtitle" style="margin-top: 1rem;">
+          Pet Society was born from a simple belief: every pet deserves to be treated with the same care, love, and expertise as family. We combine expert grooming science with genuine animal empathy.
+        </p>
+
+        <div class="about-list">
+          <div class="about-list-item">
+            <div class="about-list-icon">🌿</div>
+            <div>
+              <div class="about-list-title">100% Organic & Safe Products</div>
+              <div class="about-list-desc">Every shampoo, conditioner, and treatment we use is certified natural, cruelty-free, and dermatologically tested for sensitive pet skin.</div>
+            </div>
+          </div>
+          <div class="about-list-item">
+            <div class="about-list-icon">🏠</div>
+            <div>
+              <div class="about-list-title">Cage-Free Environment</div>
+              <div class="about-list-desc">We are proudly cage-free. Your pet roams comfortably in our temperature-controlled suites — zero stress, zero cages, pure relaxation.</div>
+            </div>
+          </div>
+          <div class="about-list-item">
+            <div class="about-list-icon">💬</div>
+            <div>
+              <div class="about-list-title">Live Photo Updates</div>
+              <div class="about-list-desc">Never worry about what's happening. We send you live progress photos throughout your pet's grooming session, every single visit.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ============================================================
+     SECTION 3: SPA EXPERIENCE
+     ============================================================ -->
+<section id="spa" class="section-pad-lg" aria-label="Spa experience and grooming">
+  <div class="container">
+
+    <div style="text-align:center; margin-bottom: var(--space-12);" class="reveal">
+      <div class="section-eyebrow section-eyebrow--pink">✂️ Spa Experience</div>
+      <h2 class="section-title section-title--teal">The Pet Society<br>Spa Is Different</h2>
+      <p class="section-subtitle" style="margin: 1rem auto 0;">
+        We don't just groom — we transform. Every visit is a full sensory wellness experience designed to reduce pet stress and maximise comfort.
+      </p>
+    </div>
+
+    <div class="spa-grid">
+
+      <!-- Image + Before/After -->
+      <div class="spa-img-wrap reveal-left">
+        <div class="spa-img-main">
+          <img src="assets/images/spa-bath.jpg"
+               alt="Golden retriever enjoying a relaxing hydrobath at Pet Society spa"
+               loading="lazy">
+        </div>
+
+        <!-- Interactive Before/After Slider -->
+        <div class="before-after-container" id="before-after" aria-label="Before and after grooming comparison. Drag the slider to compare.">
+          <div class="ba-before">
+            <img src="assets/images/before-after.jpg"
+                 alt="Dog before grooming"
+                 style="object-position: 25% center">
+          </div>
+          <div class="ba-after">
+            <img src="assets/images/before-after.jpg"
+                 alt="Dog after grooming"
+                 style="object-position: 75% center">
+          </div>
+          <div class="ba-divider"></div>
+          <div class="ba-handle" aria-label="Drag to compare">◀ ▶</div>
+          <span class="ba-label ba-label-before">Before</span>
+          <span class="ba-label ba-label-after">After</span>
+        </div>
+      </div>
+
+      <!-- Checklist -->
+      <div class="reveal-right" style="padding-left: var(--space-4);">
+        <div class="section-eyebrow">Our Signature Process</div>
+        <h2 class="section-title section-title--teal" style="margin-bottom: var(--space-6);">
+          Why Every Groom<br>Is a Work of Art
+        </h2>
+
+        <div class="spa-checklist">
+          <div class="spa-check-item">
+            <div class="spa-check-icon">✓</div>
+            <div class="spa-check-text">
+              <strong>Breed-Specific Styling</strong>
+              Our groomers are trained in over 60 breed styles — from Teddy Bear Cuts to Asian Fusion trims.
+            </div>
+          </div>
+          <div class="spa-check-item">
+            <div class="spa-check-icon">✓</div>
+            <div class="spa-check-text">
+              <strong>Mineral-Rich Hydrobaths</strong>
+              Therapeutic warm-water baths with organic aromatherapy shampoos that calm anxious pets.
+            </div>
+          </div>
+          <div class="spa-check-item">
+            <div class="spa-check-icon">✓</div>
+            <div class="spa-check-text">
+              <strong>Coat & Skin Health Assessment</strong>
+              Every groom includes a complimentary skin and coat analysis with personalised home care tips.
+            </div>
+          </div>
+          <div class="spa-check-item">
+            <div class="spa-check-icon">✓</div>
+            <div class="spa-check-text">
+              <strong>Nail, Ear & Dental Wellness</strong>
+              Complete hygiene packages including nail grinding, ear cleaning, and dental-safe breath treatment.
+            </div>
+          </div>
+          <div class="spa-check-item">
+            <div class="spa-check-icon">✓</div>
+            <div class="spa-check-text">
+              <strong>Fear-Free Techniques</strong>
+              We use certified fear-free handling — no restraints, no force, only patient positive reinforcement.
+            </div>
+          </div>
+        </div>
+
+        <button class="btn btn-fuchsia btn-lg" id="spa-book-btn" data-action="open-booking">
+          📅 Book Spa Session
+        </button>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ============================================================
+     SECTION 4: APPROACH BANNER (TEAL WAVE RIBBON)
+     ============================================================ -->
+<section id="approach" aria-label="Our approach">
+  <!-- Top wave -->
+  <div class="wave-top" aria-hidden="true">
+    <svg viewBox="0 0 1440 60" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+      <path d="M0,30 C480,60 960,0 1440,30 L1440,0 L0,0 Z" fill="#F4F9FA"/>
+    </svg>
+  </div>
+
+  <div class="approach-bg-circle-1" aria-hidden="true"></div>
+  <div class="approach-bg-circle-2" aria-hidden="true"></div>
+
+  <div class="container">
+    <div class="approach-inner reveal">
+      <div class="section-eyebrow" style="color:rgba(255,255,255,0.9);background:rgba(255,255,255,0.15);justify-content:center;">
+        🌟 Our Approach Is Simple
+      </div>
+      <h2 class="approach-title">
+        Pets First. Always.
+      </h2>
+      <p class="approach-desc">
+        We believe the best grooming experience is one where your pet feels heard, safe, and loved from the moment they walk in, to the moment they trot out looking their absolute best.
+      </p>
+      <div style="display:flex;gap:var(--space-4);justify-content:center;flex-wrap:wrap;">
+        <a href="#trust" class="btn btn-outline-white btn-lg">Why Pet Parents Trust Us</a>
+        <button class="btn btn-fuchsia btn-lg" data-action="open-booking">Book Today</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom wave -->
+  <div class="wave-bottom" aria-hidden="true" style="margin-top: var(--space-12);">
+    <svg viewBox="0 0 1440 60" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+      <path d="M0,30 C480,0 960,60 1440,30 L1440,60 L0,60 Z" fill="#ffffff"/>
+    </svg>
+  </div>
+</section>
+
+
+<!-- ============================================================
+     SECTION 5: TRUST / WHY CHOOSE US
+     ============================================================ -->
+<section id="trust" class="section-pad" aria-label="Why pet parents trust Pet Society">
+  <div class="container">
+    <div class="trust-grid">
+
+      <!-- Trust Cards -->
+      <div class="trust-cards reveal-left">
+        <div class="section-eyebrow">🏅 Why Pet Parents Trust Us</div>
+        <h2 class="section-title section-title--teal" style="margin-bottom: var(--space-8);">
+          Why Pet Parents<br>Choose Pet Society
+        </h2>
+
+        <div class="trust-card">
+          <div class="trust-card-icon trust-card-icon--teal">🏅</div>
+          <div>
+            <div class="trust-card-title">Certified & Loving Groomers</div>
+            <div class="trust-card-desc">All our groomers are nationally certified, background-checked, and trained in breed-specific fear-free handling techniques. Your pet's safety is our non-negotiable.</div>
+          </div>
+        </div>
+
+        <div class="trust-card">
+          <div class="trust-card-icon trust-card-icon--fuchsia">🛡️</div>
+          <div>
+            <div class="trust-card-title">Pet-First Safety Guarantee</div>
+            <div class="trust-card-desc">Cage-free suites, sanitised hydrobaths, organic products. We follow strict hygiene protocols and provide a full safety guarantee for every appointment.</div>
+          </div>
+        </div>
+
+        <div class="trust-card">
+          <div class="trust-card-icon trust-card-icon--cyan">💬</div>
+          <div>
+            <div class="trust-card-title">Transparent & Stress-Free</div>
+            <div class="trust-card-desc">Live WhatsApp photo updates, clear upfront pricing with zero hidden fees, and temperature-controlled suites designed to eliminate anxiety.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Image -->
+      <div class="trust-media reveal-right" style="position:relative;">
+        <span class="paw-decor trust-paw-1" aria-hidden="true">🐾</span>
+        <span class="paw-decor trust-paw-2" aria-hidden="true">🐾</span>
+        <div class="trust-img-frame">
+          <img src="assets/images/trust-parent.jpg"
+               alt="Happy pet parent holding her fluffy white dog after grooming"
+               loading="lazy">
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+
+
+
+<!-- ============================================================
+     SECTION 7: TEAM (THE BACKBONE)
+     ============================================================ -->
+<section id="team" class="section-pad" style="background: var(--color-bg);" aria-label="Our team">
+  <!-- Top wave -->
+  <div class="wave-top" aria-hidden="true">
+    <svg viewBox="0 0 1440 50" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+      <path d="M0,25 C720,50 1080,0 1440,25 L1440,0 L0,0 Z" fill="#f4f9fa"/>
+    </svg>
+  </div>
+
+  <div class="container">
+    <div class="team-header reveal">
+      <div class="section-eyebrow" style="justify-content:center;">👥 The Backbone</div>
+      <h2 class="section-title" style="text-align:center;">Ethics & Experience</h2>
+      <p class="section-subtitle" style="margin: 1rem auto 0; text-align:center;">
+        Meet the passionate people who pour their hearts into every appointment and every product recommendation.
+      </p>
+    </div>
+
+    <div class="team-grid" id="team-grid" aria-label="Team members"></div>
+
+    <!-- Video teaser card -->
+    <div class="reveal" style="margin-top: var(--space-12); max-width: 720px; margin-left: auto; margin-right: auto;">
+      <div class="card" style="border-radius: var(--radius-2xl); overflow: hidden; position: relative; aspect-ratio: 16/9; cursor: pointer;"
+           id="video-card"
+           onclick="this.innerHTML='<div style=\'display:flex;align-items:center;justify-content:center;height:100%;background:#0B6B7B;color:white;font-size:1.2rem;font-weight:600;gap:0.5rem\'>▶ Video preview coming soon — drop your own reel here!</div>'; this.style.background='#0B6B7B';">
+        <img src="assets/images/spa-bath.jpg"
+             alt="Watch our grooming salon in action"
+             style="width:100%;height:100%;object-fit:cover;"
+             loading="lazy">
+        <div style="position:absolute;inset:0;background:rgba(8,84,97,0.55);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:var(--space-4);">
+          <div style="width:72px;height:72px;border-radius:50%;background:rgba(255,255,255,0.25);border:3px solid rgba(255,255,255,0.7);display:flex;align-items:center;justify-content:center;font-size:2rem;backdrop-filter:blur(4px);transition:all 0.25s ease;animation:pawFloat 3s ease-in-out infinite;">▶</div>
+          <p style="color:rgba(255,255,255,0.9);font-size:var(--text-lg);font-weight:700;text-shadow:0 2px 8px rgba(0,0,0,0.3);">Watch Our Salon in Action</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ============================================================
+     SECTION 8: TESTIMONIALS
+     ============================================================ -->
+<section id="testimonials" aria-label="Customer testimonials">
+  <!-- Top Wave -->
+  <div class="wave-top" aria-hidden="true">
+    <svg viewBox="0 0 1440 60" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+      <path d="M0,30 C480,60 960,0 1440,30 L1440,0 L0,0 Z" fill="#F4F9FA"/>
+    </svg>
+  </div>
+
+  <div class="testimonials-bg-blob-1" aria-hidden="true"></div>
+  <div class="testimonials-bg-blob-2" aria-hidden="true"></div>
+
+  <div class="container">
+    <div class="testimonials-header reveal">
+      <div class="section-eyebrow" style="color:rgba(255,255,255,0.9);background:rgba(255,255,255,0.2);justify-content:center;">
+        ⭐ Customer Love
+      </div>
+      <h2 class="testimonials-title">Valuable Words From<br>Our Happy Pet Parents!</h2>
+      <p class="testimonials-subtitle">Real experiences from real families who trust Pet Society.</p>
+    </div>
+
+    <div class="testimonials-slider reveal">
+      <div class="testimonials-track" id="testimonials-track" role="list"></div>
+    </div>
+
+    <div class="testimonial-arrows">
+      <button class="testimonial-arrow" id="testimonial-prev" aria-label="Previous testimonials">◀</button>
+      <button class="testimonial-arrow" id="testimonial-next" aria-label="Next testimonials">▶</button>
+    </div>
+    <div class="testimonial-dots" id="testimonials-dots" role="tablist" aria-label="Testimonial pages"></div>
+  </div>
+
+  <!-- Bottom Wave -->
+  <div class="wave-bottom" style="margin-top: var(--space-12);" aria-hidden="true">
+    <svg viewBox="0 0 1440 60" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+      <path d="M0,30 C480,0 960,60 1440,30 L1440,60 L0,60 Z" fill="#085461"/>
+    </svg>
+  </div>
+</section>
+
+
+<!-- ============================================================
+     FOOTER
+     ============================================================ -->
+<footer id="footer" aria-label="Site footer">
+  <div class="footer-top">
+    <div class="container">
+      <div class="footer-grid">
+
+        <!-- Brand Column -->
+        <div class="footer-brand">
+          <a href="#" class="logo" style="margin-bottom: var(--space-4);">
+            <div class="logo-icon">🐾</div>
+            <div class="logo-text">
+              <span>Pet Society</span>
+              <span>Premium Pet Care</span>
+            </div>
+          </a>
+          <p class="footer-tagline">Premium grooming spa & curated pet products — because your fur family deserves only the best.</p>
+
+          <div class="footer-contact-item">
+            <span>📍</span>
+            <span>123 Paw Lane, Koramangala,<br>Bengaluru - 560034</span>
+          </div>
+          <div class="footer-contact-item">
+            <span>📞</span>
+            <span>+91 98765 43210</span>
+          </div>
+          <div class="footer-contact-item">
+            <span>🕐</span>
+            <span>Mon–Sat: 9am – 7pm<br>Sunday: 10am – 5pm</span>
+          </div>
+        </div>
+
+        <!-- Explore Column -->
+        <div>
+          <div class="footer-col-title">Explore</div>
+          <nav class="footer-links" aria-label="Explore links">
+            <a href="#about"        class="footer-link">About Us</a>
+            <a href="#spa"          class="footer-link">Spa Packages</a>
+            <a href="#store"        class="footer-link">Pet Store</a>
+            <a href="#team"         class="footer-link">Our Team</a>
+            <a href="#testimonials" class="footer-link">Reviews</a>
+            <a href="#"             class="footer-link">Memberships</a>
+          </nav>
+        </div>
+
+        <!-- Support Column -->
+        <div>
+          <div class="footer-col-title">Customer Care</div>
+          <nav class="footer-links" aria-label="Support links">
+            <a href="#" class="footer-link">Safety Policy</a>
+            <a href="#" class="footer-link">Shipping & Returns</a>
+            <a href="#" class="footer-link">Privacy Policy</a>
+            <a href="#" class="footer-link">Terms of Service</a>
+            <a href="#" class="footer-link">FAQs</a>
+            <a href="#" class="footer-link">Book Appointment</a>
+          </nav>
+        </div>
+
+        <!-- Newsletter Column -->
+        <div>
+          <div class="footer-col-title">Join Our Club 🐾</div>
+          <p class="newsletter-desc">
+            Get exclusive grooming tips, early sale access, and monthly pet wellness guides delivered to your inbox.
+          </p>
+          <form class="newsletter-form" id="newsletter-form" novalidate>
+            <input
+              class="newsletter-input"
+              type="email"
+              id="newsletter-email"
+              placeholder="your@email.com"
+              aria-label="Your email address"
+              required>
+            <button type="submit" class="newsletter-btn" id="newsletter-submit">Join</button>
+          </form>
+          <p style="font-size:var(--text-xs);color:rgba(255,255,255,0.4);margin-top:var(--space-3);">
+            🔒 We respect your privacy. No spam, ever.
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer Bottom Bar -->
+  <div class="footer-bottom">
+    <div class="container">
+      <div class="footer-bottom-inner">
+        <p class="footer-copy">
+          © 2026 Pet Society. All rights reserved. Made with ❤️ for pet parents.
+        </p>
+        <div class="footer-socials" aria-label="Social media links">
+          <a href="#" class="social-btn" aria-label="Instagram">📸</a>
+          <a href="#" class="social-btn" aria-label="Facebook">📘</a>
+          <a href="#" class="social-btn" aria-label="YouTube">▶️</a>
+          <a href="#" class="social-btn" aria-label="WhatsApp">💬</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+
+<!-- ============================================================
+     CART DRAWER
+     ============================================================ -->
+<aside id="cart-drawer" aria-label="Shopping cart" role="dialog" aria-modal="true">
+  <div class="cart-header">
+    <h2 class="cart-title">🛒 Your Cart</h2>
+    <button class="cart-close" id="cart-close" aria-label="Close cart">✕</button>
+  </div>
+
+  <!-- Free shipping bar -->
+  <div class="cart-shipping-bar">
+    <div class="cart-shipping-text" id="cart-shipping-text">Add ₹1,500 more for FREE delivery!</div>
+    <div class="cart-shipping-progress">
+      <div class="cart-shipping-fill" id="cart-shipping-fill" style="width:0%"></div>
+    </div>
+  </div>
+
+  <!-- Cart Items -->
+  <div class="cart-items" id="cart-items">
+    <div class="cart-empty">
+      <div class="cart-empty-icon">🛒</div>
+      <p style="font-weight:600;color:var(--color-slate-700)">Your cart is empty</p>
+      <p style="font-size:var(--text-sm)">Add some amazing pet products!</p>
+    </div>
+  </div>
+
+  <!-- Cart Footer -->
+  <div class="cart-footer">
+    <div class="cart-subtotal">
+      <span class="cart-subtotal-label">Subtotal</span>
+      <span class="cart-subtotal-value" id="cart-subtotal">₹0</span>
+    </div>
+    <button class="cart-checkout-btn" id="cart-checkout-btn" data-action="checkout">
+      🎉 Proceed to Checkout →
+    </button>
+    <p class="cart-continue" onclick="window.cartAPI.closeCart()">← Continue Shopping</p>
+  </div>
+</aside>
+
+
+<!-- ============================================================
+     BOOKING MODAL
+     ============================================================ -->
+<div id="booking-modal" role="dialog" aria-modal="true" aria-label="Book a spa appointment">
+  <div class="booking-modal-box">
+
+    <div class="booking-modal-top">
+      <button class="booking-modal-close" id="booking-modal-close" aria-label="Close booking modal">✕</button>
+      <h2 class="booking-modal-title">📅 Book a Spa Appointment</h2>
+      <p class="booking-modal-subtitle">Fill in the details and we'll confirm your slot via SMS.</p>
+    </div>
+
+    <div class="booking-modal-body">
+      <form id="booking-form" novalidate>
+
+        <div class="booking-field">
+          <label class="booking-label" for="booking-name">Your Name *</label>
+          <input class="booking-input" type="text" id="booking-name" placeholder="e.g. Priya Sharma" required>
+        </div>
+
+        <div class="booking-field">
+          <label class="booking-label" for="booking-phone">Phone Number *</label>
+          <input class="booking-input" type="tel" id="booking-phone" placeholder="+91 98765 43210" required>
+        </div>
+
+        <div class="booking-field">
+          <label class="booking-label" for="booking-pet-name">Pet's Name *</label>
+          <input class="booking-input" type="text" id="booking-pet-name" placeholder="e.g. Bruno" required>
+        </div>
+
+        <div class="booking-field">
+          <label class="booking-label" for="booking-pet-type">Pet Type</label>
+          <select class="booking-select" id="booking-pet-type">
+            <option value="">Select your pet type</option>
+            <option value="small-dog">Small Dog (under 10 kg)</option>
+            <option value="medium-dog">Medium Dog (10–25 kg)</option>
+            <option value="large-dog">Large Dog (25 kg+)</option>
+            <option value="cat">Cat</option>
+          </select>
+        </div>
+
+        <div class="booking-field">
+          <label class="booking-label">Choose Service *</label>
+          <div class="booking-service-grid" id="booking-services-grid"></div>
+        </div>
+
+        <div class="booking-field">
+          <label class="booking-label" for="booking-date">Preferred Date *</label>
+          <input class="booking-input" type="date" id="booking-date" required>
+        </div>
+
+        <div class="booking-field">
+          <label class="booking-label" for="booking-time">Preferred Time</label>
+          <select class="booking-select" id="booking-time">
+            <option value="">Select a time slot</option>
+            <option value="09:00">9:00 AM</option>
+            <option value="10:00">10:00 AM</option>
+            <option value="11:00">11:00 AM</option>
+            <option value="12:00">12:00 PM</option>
+            <option value="14:00">2:00 PM</option>
+            <option value="15:00">3:00 PM</option>
+            <option value="16:00">4:00 PM</option>
+            <option value="17:00">5:00 PM</option>
+          </select>
+        </div>
+
+        <button type="submit" class="booking-submit" id="booking-submit-btn">
+          🎉 Confirm Appointment
+        </button>
+
+      </form>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ============================================================
+     JAVASCRIPT
+     ============================================================ -->
+<!-- Delegate all data-action clicks globally before module loads -->
+<script>
+  (function() {
+    // Queue actions until app is ready
+    var _pendingActions = [];
+    var _ready = false;
+    var _handlers = {};
+
+    window._appBus = {
+      register: function(name, fn) {
+        _handlers[name] = fn;
+        if (!_ready) {
+          _ready = true;
+          _pendingActions.forEach(function(a) { if (_handlers[a.name]) _handlers[a.name](a.el); });
+          _pendingActions = [];
+        }
+      },
+      trigger: function(name, el) {
+        if (_handlers[name]) { _handlers[name](el); }
+        else { _pendingActions.push({ name: name, el: el }); }
+      }
+    };
+
+    // Global delegated click handler
+    document.addEventListener('click', function(e) {
+      var btn = e.target.closest('[data-action]');
+      if (!btn) return;
+      var action = btn.dataset.action;
+      var closeMobile = btn.dataset.closeMobile;
+      if (closeMobile) { document.getElementById('mobile-nav')?.classList.remove('open'); }
+      window._appBus.trigger(action, btn);
+    });
+
+    // Mark body as JS-loaded for progressive reveal
+    document.documentElement.classList.add('js-loaded');
+  })();
+</script>
+<script type="module" src="js/app.js"></script>
+
+</body>
+</html>

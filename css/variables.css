@@ -1,0 +1,150 @@
+/* ==========================================================
+   PET SOCIETY — DESIGN TOKENS
+   ========================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=Fraunces:wght@700;800;900&display=swap');
+
+:root {
+  /* ---- BRAND COLORS ---- */
+  --color-teal-deep:       #085461;
+  --color-teal-mid:        #0B6B7B;
+  --color-teal-bright:     #0FA3B4;
+  --color-teal-light:      #5FCFDC;
+  --color-teal-pale:       #DFF5F8;
+  --color-teal-ghost:      #EEF9FB;
+
+  --color-fuchsia:         #D91A8D;
+  --color-fuchsia-light:   #F0489E;
+  --color-fuchsia-pale:    #FCE4F3;
+
+  --color-cyan:            #00BCD4;
+  --color-cyan-dark:       #0097A7;
+  --color-cyan-pale:       #E0F7FA;
+
+  --color-sky:             #6EC1E4;
+  --color-sky-pale:        #E8F6FC;
+
+  --color-white:           #FFFFFF;
+  --color-off-white:       #F8FBFC;
+  --color-bg:              #F4F9FA;
+
+  --color-slate-900:       #0F172A;
+  --color-slate-800:       #1E293B;
+  --color-slate-700:       #334155;
+  --color-slate-500:       #64748B;
+  --color-slate-400:       #94A3B8;
+  --color-slate-200:       #E2E8F0;
+  --color-slate-100:       #F1F5F9;
+
+  --color-gold:            #F59E0B;
+  --color-gold-light:      #FCD34D;
+
+  /* ---- SEMANTIC ALIASES ---- */
+  --brand-primary:   var(--color-teal-deep);
+  --brand-accent:    var(--color-fuchsia);
+  --brand-cta:       var(--color-teal-bright);
+  --text-primary:    var(--color-slate-800);
+  --text-secondary:  var(--color-slate-500);
+  --text-muted:      var(--color-slate-400);
+  --text-on-dark:    var(--color-white);
+  --bg-page:         var(--color-white);
+  --bg-section-alt:  var(--color-off-white);
+  --border-color:    var(--color-slate-200);
+
+  /* ---- TYPOGRAPHY ---- */
+  --font-body:     'Plus Jakarta Sans', system-ui, sans-serif;
+  --font-display:  'Fraunces', 'Plus Jakarta Sans', serif;
+
+  --text-xs:    0.75rem;    /* 12px */
+  --text-sm:    0.875rem;   /* 14px */
+  --text-base:  1rem;       /* 16px */
+  --text-lg:    1.125rem;   /* 18px */
+  --text-xl:    1.25rem;    /* 20px */
+  --text-2xl:   1.5rem;     /* 24px */
+  --text-3xl:   1.875rem;   /* 30px */
+  --text-4xl:   2.25rem;    /* 36px */
+  --text-5xl:   3rem;       /* 48px */
+  --text-6xl:   3.75rem;    /* 60px */
+
+  --font-light:      300;
+  --font-regular:    400;
+  --font-medium:     500;
+  --font-semibold:   600;
+  --font-bold:       700;
+  --font-extrabold:  800;
+
+  --leading-tight:   1.15;
+  --leading-snug:    1.35;
+  --leading-normal:  1.6;
+  --leading-relaxed: 1.75;
+
+  --tracking-tight:  -0.02em;
+  --tracking-normal: 0;
+  --tracking-wide:   0.05em;
+  --tracking-wider:  0.08em;
+
+  /* ---- SPACING ---- */
+  --space-1:   0.25rem;
+  --space-2:   0.5rem;
+  --space-3:   0.75rem;
+  --space-4:   1rem;
+  --space-5:   1.25rem;
+  --space-6:   1.5rem;
+  --space-8:   2rem;
+  --space-10:  2.5rem;
+  --space-12:  3rem;
+  --space-16:  4rem;
+  --space-20:  5rem;
+  --space-24:  6rem;
+  --space-32:  8rem;
+
+  --container-max:   1320px;
+  --container-pad:   clamp(1rem, 4vw, 2rem);
+
+  /* ---- BORDER RADIUS ---- */
+  --radius-sm:   0.375rem;
+  --radius-md:   0.75rem;
+  --radius-lg:   1.25rem;
+  --radius-xl:   2rem;
+  --radius-2xl:  3rem;
+  --radius-full: 9999px;
+
+  /* ---- SHADOWS ---- */
+  --shadow-xs:  0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-sm:  0 4px 12px rgba(0,0,0,0.06), 0 2px 6px rgba(0,0,0,0.04);
+  --shadow-md:  0 10px 30px rgba(0,0,0,0.08), 0 4px 12px rgba(0,0,0,0.05);
+  --shadow-lg:  0 20px 50px rgba(0,0,0,0.10), 0 8px 20px rgba(0,0,0,0.06);
+  --shadow-xl:  0 32px 80px rgba(0,0,0,0.12), 0 12px 30px rgba(0,0,0,0.08);
+
+  --shadow-teal:    0 12px 40px rgba(11, 107, 123, 0.25);
+  --shadow-fuchsia: 0 12px 40px rgba(217, 26, 141, 0.30);
+  --shadow-cyan:    0 8px 24px rgba(0, 188, 212, 0.30);
+
+  /* ---- TRANSITIONS ---- */
+  --ease-out:   cubic-bezier(0.0, 0.0, 0.2, 1);
+  --ease-in:    cubic-bezier(0.4, 0.0, 1, 1);
+  --ease-inout: cubic-bezier(0.4, 0.0, 0.2, 1);
+  --ease-spring:cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  --duration-fast:   150ms;
+  --duration-base:   250ms;
+  --duration-slow:   400ms;
+  --duration-slower: 600ms;
+
+  --transition-base:      all var(--duration-base) var(--ease-out);
+  --transition-transform: transform var(--duration-base) var(--ease-out);
+  --transition-color:     color var(--duration-fast) var(--ease-out), background-color var(--duration-fast) var(--ease-out);
+
+  /* ---- Z-INDEX ---- */
+  --z-below:    -1;
+  --z-base:      0;
+  --z-raised:    10;
+  --z-dropdown:  100;
+  --z-sticky:    200;
+  --z-drawer:    300;
+  --z-modal:     400;
+  --z-toast:     500;
+
+  /* ---- HEADER ---- */
+  --header-height: 76px;
+}

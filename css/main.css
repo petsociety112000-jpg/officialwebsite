@@ -1,0 +1,341 @@
+/* ==========================================================
+   PET SOCIETY — BASE STYLES & LAYOUT
+   ========================================================== */
+
+/* --- RESET & BASE ---------------------------------------- */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+  font-size: 16px;
+}
+
+body {
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  line-height: var(--leading-normal);
+  color: var(--text-primary);
+  background-color: var(--bg-page);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+img, video {
+  max-width: 100%;
+  display: block;
+}
+
+a { text-decoration: none; color: inherit; }
+
+button {
+  font-family: var(--font-body);
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+ul, ol { list-style: none; }
+
+/* --- CONTAINER ------------------------------------------- */
+.container {
+  max-width: var(--container-max);
+  margin: 0 auto;
+  padding: 0 var(--container-pad);
+}
+
+/* --- SECTION UTILITIES ----------------------------------- */
+.section-pad { padding: var(--space-20) 0; }
+.section-pad-lg { padding: var(--space-24) 0; }
+.section-pad-xl { padding: var(--space-32) 0; }
+
+.section-title {
+  font-family: var(--font-body);
+  font-size: clamp(var(--text-3xl), 4vw, var(--text-5xl));
+  font-weight: var(--font-extrabold);
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-tight);
+  color: var(--color-slate-800);
+}
+
+.section-title--light { color: var(--color-white); }
+.section-title--teal  { color: var(--color-teal-deep); }
+
+.section-subtitle {
+  font-size: var(--text-lg);
+  line-height: var(--leading-relaxed);
+  color: var(--text-secondary);
+  max-width: 60ch;
+}
+
+.section-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-xs);
+  font-weight: var(--font-semibold);
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+  color: var(--color-teal-bright);
+  background: var(--color-teal-ghost);
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-full);
+  margin-bottom: var(--space-4);
+}
+
+.section-eyebrow--pink {
+  color: var(--color-fuchsia);
+  background: var(--color-fuchsia-pale);
+}
+
+/* --- FLEX & GRID UTILITIES ------------------------------- */
+.flex { display: flex; }
+.flex-col { flex-direction: column; }
+.flex-center { display: flex; align-items: center; justify-content: center; }
+.items-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+.gap-4 { gap: var(--space-4); }
+.gap-6 { gap: var(--space-6); }
+.gap-8 { gap: var(--space-8); }
+
+/* --- BUTTON SYSTEM --------------------------------------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  font-weight: var(--font-semibold);
+  line-height: 1;
+  border-radius: var(--radius-full);
+  padding: 0.85rem 1.75rem;
+  transition: var(--transition-base);
+  white-space: nowrap;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(255,255,255,0.15);
+  opacity: 0;
+  transition: opacity var(--duration-fast) var(--ease-out);
+}
+
+.btn:hover::before { opacity: 1; }
+.btn:active { transform: scale(0.98); }
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--color-teal-bright) 0%, var(--color-teal-mid) 100%);
+  color: var(--color-white);
+  box-shadow: var(--shadow-cyan);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 40px rgba(0, 188, 212, 0.40);
+}
+
+.btn-secondary {
+  background: var(--color-white);
+  color: var(--color-teal-deep);
+  border: 2px solid var(--color-teal-pale);
+  box-shadow: var(--shadow-xs);
+}
+
+.btn-secondary:hover {
+  border-color: var(--color-teal-bright);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-fuchsia {
+  background: linear-gradient(135deg, var(--color-fuchsia-light) 0%, var(--color-fuchsia) 100%);
+  color: var(--color-white);
+  box-shadow: var(--shadow-fuchsia);
+}
+
+.btn-fuchsia:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 40px rgba(217, 26, 141, 0.45);
+}
+
+.btn-outline-white {
+  background: transparent;
+  color: var(--color-white);
+  border: 2px solid rgba(255,255,255,0.6);
+}
+
+.btn-outline-white:hover {
+  background: rgba(255,255,255,0.15);
+  border-color: var(--color-white);
+}
+
+.btn-sm { padding: 0.6rem 1.25rem; font-size: var(--text-sm); }
+.btn-lg { padding: 1.1rem 2.25rem; font-size: var(--text-lg); }
+
+/* --- BADGE / PILL ---------------------------------------- */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: var(--text-xs);
+  font-weight: var(--font-semibold);
+  padding: 0.25rem 0.65rem;
+  border-radius: var(--radius-full);
+  line-height: 1;
+}
+
+.badge-teal   { background: var(--color-teal-pale);    color: var(--color-teal-deep); }
+.badge-fuchsia{ background: var(--color-fuchsia-pale); color: var(--color-fuchsia); }
+.badge-gold   { background: #FEF3C7; color: #92400E; }
+
+/* --- STAR RATING ----------------------------------------- */
+.star-rating {
+  display: inline-flex;
+  gap: 2px;
+  color: var(--color-gold);
+  font-size: var(--text-sm);
+}
+
+/* --- PAW DECORATION -------------------------------------- */
+.paw-decor {
+  position: absolute;
+  pointer-events: none;
+  font-size: 1.5rem;
+  opacity: 0.12;
+  animation: pawFloat 6s ease-in-out infinite;
+  user-select: none;
+}
+
+@keyframes pawFloat {
+  0%, 100% { transform: translateY(0) rotate(-15deg); }
+  50% { transform: translateY(-18px) rotate(-5deg); }
+}
+
+.paw-decor:nth-child(2) { animation-delay: -2s; animation-duration: 8s; }
+.paw-decor:nth-child(3) { animation-delay: -4s; animation-duration: 7s; }
+
+/* --- WAVE DIVIDERS --------------------------------------- */
+.wave-top,
+.wave-bottom {
+  display: block;
+  width: 100%;
+  overflow: hidden;
+  line-height: 0;
+}
+
+.wave-top svg { display: block; }
+.wave-bottom svg { display: block; }
+
+/* --- CARD BASE ------------------------------------------- */
+.card {
+  background: var(--color-white);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  transition: var(--transition-base);
+  overflow: hidden;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+
+/* --- SCROLL ANIMATIONS ----------------------------------- */
+.reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.6s var(--ease-out), transform 0.6s var(--ease-out);
+}
+
+.reveal.visible {
+  opacity: 1;
+  transform: none;
+}
+
+.reveal-left {
+  opacity: 0;
+  transform: translateX(-36px);
+  transition: opacity 0.65s var(--ease-out), transform 0.65s var(--ease-out);
+}
+
+.reveal-left.visible {
+  opacity: 1;
+  transform: none;
+}
+
+.reveal-right {
+  opacity: 0;
+  transform: translateX(36px);
+  transition: opacity 0.65s var(--ease-out), transform 0.65s var(--ease-out);
+}
+
+.reveal-right.visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* --- TOAST NOTIFICATION ---------------------------------- */
+#toast-container {
+  position: fixed;
+  bottom: var(--space-6);
+  right: var(--space-6);
+  z-index: var(--z-toast);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.toast {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  background: var(--color-slate-800);
+  color: var(--color-white);
+  padding: var(--space-4) var(--space-5);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-xl);
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  min-width: 260px;
+  animation: toastIn var(--duration-slow) var(--ease-spring) forwards;
+}
+
+.toast.toast-success { border-left: 4px solid var(--color-teal-bright); }
+.toast.toast-out { animation: toastOut var(--duration-slow) var(--ease-in) forwards; }
+
+@keyframes toastIn {
+  from { opacity: 0; transform: translateX(100%); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes toastOut {
+  from { opacity: 1; transform: translateX(0); }
+  to   { opacity: 0; transform: translateX(100%); }
+}
+
+/* --- OVERLAY BACKDROP ------------------------------------ */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(4px);
+  z-index: var(--z-drawer);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--duration-base) var(--ease-out);
+}
+
+.overlay.active {
+  opacity: 1;
+  pointer-events: all;
+}
