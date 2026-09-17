@@ -21,6 +21,7 @@ A modern, responsive web application for **Pet Society** — a premier cage-free
 ### 🛍️ E-Commerce Store & Cart System
 - **Product Catalog**: Curated foods, veterinary-approved nutrition, organic treats, grooming shampoos, and accessories.
 - **Dynamic Category Filtering**: Instant client-side filtering (Dog Food, Cat Nutrition, Treats, Grooming, Accessories) with badges (*Best Seller*, *New*, *Sale*).
+- **Two-Stage Product Browsing**: Click a product once for a quick in-page preview, then click the preview content to open the complete product detail page.
 - **Persistent Shopping Cart**: Slide-out cart drawer with quantity adjustments, item removal, price calculation, and LocalStorage persistence.
 - **Interactive Wishlist**: Save favorite items with quick toggle and counter badges.
 - **Razorpay Checkout**: Razorpay-hosted test-mode payment window for UPI, cards, wallets, and net banking.

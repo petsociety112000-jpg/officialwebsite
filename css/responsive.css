@@ -49,6 +49,9 @@
 
 /* ---- SMALL TABLET: ≤ 768px ---- */
 @media (max-width: 768px) {
+  .product-page-card { grid-template-columns: 1fr; }
+  .product-page-image-wrap { min-height: 320px; }
+
   :root { --header-height: 64px; }
 
   /* Hide desktop nav links */

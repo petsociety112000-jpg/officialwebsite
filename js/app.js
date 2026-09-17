@@ -237,6 +237,7 @@ function openProductDetails(product) {
   const panel = document.getElementById('product-details-panel');
   const card = document.getElementById(`product-${product.id}`);
   if (!panel || !card) return;
+  panel.dataset.productId = product.id;
   document.querySelectorAll('.product-card.selected').forEach(item => item.classList.remove('selected'));
   card.classList.add('selected');
   document.getElementById('product-details-image').src = product.image;
@@ -824,6 +825,11 @@ function initCheckout() {
 
 function initProductDetails() {
   document.getElementById('product-details-close')?.addEventListener('click', closeProductDetails);
+  document.querySelector('.product-details-box')?.addEventListener('click', event => {
+    if (event.target.closest('button')) return;
+    const productId = document.getElementById('product-details-panel')?.dataset.productId;
+    if (productId) window.location.href = `product.html#${encodeURIComponent(productId)}`;
+  });
 }
 
 
