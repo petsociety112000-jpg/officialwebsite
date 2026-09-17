@@ -35,6 +35,11 @@ export function addToCart(product) {
   updateCartBadge();
 }
 
+export function buyNow(product) {
+  addToCart(product);
+  openCart();
+}
+
 // ---- REMOVE FROM CART ------------------------------------
 export function removeFromCart(productId) {
   cartState.items = cartState.items.filter(i => i.id !== productId);

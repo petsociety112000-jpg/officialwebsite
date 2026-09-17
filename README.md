@@ -23,6 +23,7 @@ A modern, responsive web application for **Pet Society** — a premier cage-free
 - **Dynamic Category Filtering**: Instant client-side filtering (Dog Food, Cat Nutrition, Treats, Grooming, Accessories) with badges (*Best Seller*, *New*, *Sale*).
 - **Persistent Shopping Cart**: Slide-out cart drawer with quantity adjustments, item removal, price calculation, and LocalStorage persistence.
 - **Interactive Wishlist**: Save favorite items with quick toggle and counter badges.
+- **Razorpay Checkout**: Razorpay-hosted test-mode payment window for UPI, cards, wallets, and net banking.
 
 ### 🎨 Visuals & User Experience
 - **Cage-Free Luxury Experience**: Showcase sections detailing stress-free grooming environments and certified groomers.
@@ -95,6 +96,21 @@ A modern web browser (Google Chrome, Firefox, Microsoft Edge, Safari).
 - **Markup**: Semantic HTML5 with accessible ARIA attributes and SEO meta tags.
 - **Styling**: Vanilla CSS3 utilizing CSS Custom Properties (CSS variables), Flexbox, and CSS Grid.
 - **Scripting**: Modern Vanilla JavaScript (ES6+ Modules, LocalStorage API, DOM Manipulation).
+
+### Razorpay test-mode setup
+
+The checkout loads Razorpay Checkout and uses a client-side **Test Key ID** only. In
+`index.html`, replace `rzp_test_REPLACE_WITH_KEY_ID` in `window.PET_SOCIETY_CONFIG`
+with the Key ID from the Razorpay dashboard. Never put the Razorpay Key Secret in
+this repository or in browser code.
+
+The checkout sends online payments to the Razorpay-hosted window; it does not
+collect or store card/UPI details in this site. The current static-site
+integration can be tested with a configured Test Key ID and shows confirmation
+after Razorpay reports success. For production, add a server endpoint that
+creates a Razorpay Order, verifies `razorpay_signature` on the server, and only
+then marks the order paid. Do not treat a browser callback alone as payment
+verification.
 
 ---
 

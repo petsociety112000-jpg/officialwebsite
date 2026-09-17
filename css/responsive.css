@@ -93,6 +93,8 @@
   }
 
   .logo-text { display: none; }
+  #toast-container { top: calc(var(--header-height) + var(--space-3)); right: var(--space-3); left: var(--space-3); }
+  .toast { min-width: 0; }
 
   #hero {
     height: auto;
@@ -146,6 +148,10 @@
   .cart-drawer { width: 100vw; right: -100vw; }
   #cart-drawer.open { right: 0; }
 
+  .checkout-layout { grid-template-columns: 1fr; }
+  .checkout-summary { position: static; grid-row: 1; }
+  .checkout-shell { padding-top: var(--space-4); }
+
   .team-grid { grid-template-columns: 1fr; }
 
   .filter-pills { gap: var(--space-2); }
@@ -155,6 +161,19 @@
   .about-img-badge { right: 0; }
 
   .approach-title { font-size: var(--text-3xl); }
+
+  .saved-addresses, .delivery-slots, .payment-options { grid-template-columns: 1fr; }
+  .checkout-card { padding: var(--space-4); }
+  .product-details-box { grid-template-columns: 1fr; max-height: 92dvh; }
+  .product-details-image-wrap { min-height: 190px; padding: var(--space-5); }
+  .product-details-image-wrap img { max-height: 180px; }
+  .product-details-content { padding: var(--space-5); }
+  .order-confirmation-shell { padding-top: var(--space-8); }
+  .order-tracking { align-items: stretch; flex-direction: column; gap: var(--space-3); }
+  .tracking-step { flex-direction: row; min-width: 0; text-align: left; }
+  .tracking-line { width: 2px; height: 18px; min-height: 18px; margin: 0 0 0 13px; }
+  .confirmation-grid { grid-template-columns: 1fr; }
+  .confirmation-actions { flex-direction: column; }
 }
 
 

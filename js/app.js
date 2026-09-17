@@ -4,8 +4,8 @@
 
 import { PRODUCTS, CATEGORIES, TESTIMONIALS, TEAM } from './data.js';
 import {
-  addToCart, toggleWishlist, openCart, closeCart,
-  renderCart, showToast, updateCartBadge
+  addToCart, buyNow, toggleWishlist, openCart, closeCart,
+  renderCart, showToast, updateCartBadge, cartState, getSubtotal
 } from './cart.js';
 import {
   openBooking, closeBooking, renderBookingModal,
@@ -13,7 +13,7 @@ import {
 } from './booking.js';
 
 // ---- EXPOSE APIS TO WINDOW (for inline HTML handlers) ----
-window.cartAPI = { addToCart, toggleWishlist, openCart, closeCart, updateQty: (id, d) => { import('./cart.js').then(m => m.updateQty(id, d)); } };
+window.cartAPI = { addToCart, buyNow, toggleWishlist, openCart, closeCart, updateQty: (id, d) => { import('./cart.js').then(m => m.updateQty(id, d)); } };
 window.bookingAPI = { openBooking, closeBooking, selectService };
 
 // ============================================================
@@ -71,6 +71,8 @@ function initHeader() {
     closeMobileNav();
     closeCart();
     closeBooking();
+    closeCheckout();
+    closeProductDetails();
   });
 }
 
@@ -177,7 +179,7 @@ function renderProducts(category) {
 
 
   productGrid.innerHTML = filtered.map(product => `
-    <div class="product-card reveal" id="product-${product.id}">
+    <div class="product-card reveal" id="product-${product.id}" data-product-id="${product.id}" tabindex="0" role="button" aria-label="View details for ${product.name}">
       <div class="product-img-wrap">
         ${product.badge ? `<span class="badge product-badge badge-${product.badgeType || 'teal'}">${product.badge}</span>` : ''}
         <button class="product-wishlist" id="wish-${product.id}"
@@ -201,15 +203,65 @@ function renderProducts(category) {
           ${product.originalPrice ? `<span class="product-price-original">₹${product.originalPrice.toLocaleString('en-IN')}</span>` : ''}
           ${product.originalPrice ? `<span class="product-price-discount">${Math.round((1 - product.price/product.originalPrice)*100)}% off</span>` : ''}
         </div>
-        <button class="product-add-btn" onclick="window.cartAPI.addToCart(${JSON.stringify(product).replace(/"/g, '&quot;')})">
-          🛒 Add to Cart
-        </button>
+        <div class="product-actions">
+          <button class="product-add-btn" onclick="window.cartAPI.addToCart(${JSON.stringify(product).replace(/"/g, '&quot;')})">
+            🛒 Add to Cart
+          </button>
+          <button class="product-buy-btn" onclick="window.cartAPI.buyNow(${JSON.stringify(product).replace(/"/g, '&quot;')})">
+            ⚡ Buy Now
+          </button>
+        </div>
       </div>
     </div>
   `).join('');
 
   // Re-observe newly rendered cards
   initScrollReveal();
+  productGrid.querySelectorAll('.product-card').forEach(card => {
+    const product = PRODUCTS.find(item => item.id === card.dataset.productId);
+    if (!product) return;
+    card.addEventListener('click', event => {
+      if (event.target.closest('button')) return;
+      openProductDetails(product);
+    });
+    card.addEventListener('keydown', event => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        openProductDetails(product);
+      }
+    });
+  });
+}
+
+function openProductDetails(product) {
+  const panel = document.getElementById('product-details-panel');
+  const card = document.getElementById(`product-${product.id}`);
+  if (!panel || !card) return;
+  document.querySelectorAll('.product-card.selected').forEach(item => item.classList.remove('selected'));
+  card.classList.add('selected');
+  document.getElementById('product-details-image').src = product.image;
+  document.getElementById('product-details-image').alt = product.name;
+  document.getElementById('product-details-category').textContent = product.categoryLabel;
+  document.getElementById('product-details-name').textContent = product.name;
+  document.getElementById('product-details-weight').textContent = product.weight;
+  document.getElementById('product-details-rating').innerHTML = `<span class="star-rating">${'★'.repeat(Math.floor(product.rating))}${product.rating % 1 ? '½' : ''}</span><strong>${product.rating}</strong><span class="rating-count">(${product.reviews} reviews)</span>`;
+  document.getElementById('product-details-description').textContent = product.description;
+  document.getElementById('product-details-price').textContent = `₹${product.price.toLocaleString('en-IN')}`;
+  document.getElementById('product-details-add').onclick = () => window.cartAPI.addToCart(product);
+  document.getElementById('product-details-buy').onclick = () => {
+    closeProductDetails();
+    window.cartAPI.buyNow(product);
+  };
+  panel.classList.add('open');
+  document.getElementById('overlay')?.classList.add('active');
+}
+
+function closeProductDetails() {
+  document.getElementById('product-details-panel')?.classList.remove('open');
+  document.querySelectorAll('.product-card.selected').forEach(card => card.classList.remove('selected'));
+  if (!document.getElementById('cart-drawer')?.classList.contains('open')) {
+    document.getElementById('overlay')?.classList.remove('active');
+  }
 }
 
 
@@ -400,7 +452,9 @@ function initNewsletter() {
 function initSmoothScroll() {
   document.querySelectorAll('a[href^="#"]').forEach(a => {
     a.addEventListener('click', e => {
-      const target = document.querySelector(a.getAttribute('href'));
+      const href = a.getAttribute('href');
+      if (!href || href === '#') return;
+      const target = document.querySelector(href);
       if (target) {
         e.preventDefault();
         const top = target.getBoundingClientRect().top + window.scrollY - 80;
@@ -426,6 +480,350 @@ function initCartDrawer() {
     window.cartAPI.updateQty = m.updateQty;
     window.cartAPI.removeFromCart = m.removeFromCart;
   });
+}
+
+function openCheckout() {
+  if (!cartState.items.length) {
+    showToast('🛒 Add an item before checking out.', 'error');
+    return;
+  }
+  closeCart();
+  renderCheckout();
+  document.getElementById('checkout-page')?.classList.add('open');
+  document.getElementById('overlay')?.classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeCheckout() {
+  document.getElementById('checkout-page')?.classList.remove('open');
+  if (!document.getElementById('cart-drawer')?.classList.contains('open') &&
+      !document.getElementById('booking-modal')?.classList.contains('open')) {
+    document.getElementById('overlay')?.classList.remove('active');
+    document.body.style.overflow = '';
+  }
+}
+
+function showOrderConfirmation(order) {
+  document.getElementById('confirmation-customer').textContent = order.customerName;
+  document.getElementById('confirmation-order-id').textContent = order.orderId;
+  document.getElementById('confirmation-placed-time').textContent = order.placedAt;
+  document.getElementById('confirmation-address').textContent = `${order.address}, ${order.city}, ${order.country} - ${order.postal}`;
+  document.getElementById('confirmation-contact').textContent = order.email || order.phone
+    ? `${order.email} · ${order.phone}`
+    : 'Contact details were not provided';
+  document.getElementById('confirmation-payment').textContent = `Payment: ${order.paymentMethod}`;
+  document.getElementById('confirmation-total').textContent = `₹${order.total.toLocaleString('en-IN')}`;
+  document.getElementById('confirmation-items').innerHTML = order.items.map(item =>
+    `<div class="confirmation-item"><span>${item.name} × ${item.qty}</span><strong>₹${(item.price * item.qty).toLocaleString('en-IN')}</strong></div>`
+  ).join('');
+  document.getElementById('checkout-page')?.classList.remove('open');
+  document.getElementById('order-confirmation')?.classList.add('open');
+  document.getElementById('overlay')?.classList.remove('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeOrderConfirmation() {
+  document.getElementById('order-confirmation')?.classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function completeOrder(order) {
+  localStorage.setItem('petSocietyLastOrder', JSON.stringify(order));
+  cartState.items = [];
+  updateCartBadge();
+  renderCart();
+  closeCheckout();
+  showOrderConfirmation({ ...order, placedAt: new Date().toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' }) });
+}
+
+function launchRazorpay(order) {
+  const keyId = window.PET_SOCIETY_CONFIG?.razorpayKeyId;
+  if (!keyId || keyId.includes('REPLACE_WITH')) {
+    showToast('Payment gateway is not configured. Add a Razorpay Test Key ID first.', 'error');
+    return;
+  }
+  if (typeof window.Razorpay !== 'function') {
+    showToast('Razorpay could not load. Check your internet connection and try again.', 'error');
+    return;
+  }
+  const razorpay = new window.Razorpay({
+    key: keyId,
+    amount: order.total * 100,
+    currency: 'INR',
+    name: 'Pet Society',
+    description: `Pet Society order ${order.orderId}`,
+    prefill: {
+      ...(order.customerName ? { name: order.customerName } : {}),
+      ...(order.email ? { email: order.email } : {}),
+      ...(order.phone ? { contact: order.phone } : {})
+    },
+    notes: { order_id: order.orderId },
+    method: { upi: true, card: true, wallet: true, netbanking: true },
+    theme: { color: '#0B6B7B' },
+    handler: response => {
+      completeOrder({ ...order, paymentMethod: `Razorpay (${response.razorpay_payment_id})` });
+    },
+    modal: {
+      ondismiss: () => showToast('Payment cancelled. Your cart is still saved.', 'error')
+    }
+  });
+  razorpay.on('payment.failed', response => {
+    showToast(`Payment failed: ${response.error?.description || 'Please try again.'}`, 'error');
+  });
+  razorpay.open();
+}
+
+function renderCheckout() {
+  const itemsEl = document.getElementById('checkout-items');
+  const itemTotalEl = document.getElementById('checkout-item-total');
+  const totalEl = document.getElementById('checkout-total');
+  if (!itemsEl) return;
+  const subtotal = getSubtotal();
+  itemsEl.innerHTML = cartState.items.map(item => `
+    <div class="checkout-item">
+      <img src="${item.image}" alt="${item.name}">
+      <div><strong>${item.name}</strong><small>${item.weight} · Qty ${item.qty}</small></div>
+      <b>₹${(item.price * item.qty).toLocaleString('en-IN')}</b>
+    </div>
+  `).join('');
+  if (itemTotalEl) itemTotalEl.textContent = `₹${subtotal.toLocaleString('en-IN')}`;
+  if (totalEl) totalEl.textContent = `₹${subtotal.toLocaleString('en-IN')}`;
+}
+
+function initCheckout() {
+  document.getElementById('checkout-close')?.addEventListener('click', closeCheckout);
+  document.getElementById('checkout-form')?.addEventListener('submit', event => {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const paymentMethod = form.querySelector('input[name="payment-method"]:checked')?.value;
+    if (!form.checkValidity()) {
+      form.reportValidity();
+      showToast('Please complete the highlighted checkout details.', 'error');
+      return;
+    }
+
+    const orderId = `PS${Date.now().toString().slice(-8)}`;
+    const firstName = document.getElementById('checkout-first-name').value.trim();
+    const lastName = document.getElementById('checkout-last-name').value.trim();
+    const order = {
+      orderId,
+      customerName: `${firstName} ${lastName}`.trim(),
+      email: document.getElementById('checkout-email').value.trim(),
+      phone: document.getElementById('checkout-phone').value.trim(),
+      address: document.getElementById('checkout-flat').value.trim(),
+      city: document.getElementById('checkout-city').value.trim(),
+      country: document.getElementById('checkout-country').selectedOptions[0]?.textContent || '',
+      postal: document.getElementById('checkout-pincode').value.trim(),
+      paymentMethod,
+      total: getSubtotal(),
+      items: cartState.items.map(item => ({ ...item }))
+    };
+    if (paymentMethod === 'Cash on delivery') {
+      completeOrder(order);
+      showToast(`🎉 Order ${orderId} confirmed.`, 'success');
+      return;
+    }
+    if (paymentMethod === 'UPI') {
+      completeOrder({ ...order, paymentMethod: 'UPI (Demo)' });
+      showToast(`✅ Demo UPI payment successful. Order ${orderId} confirmed.`, 'success');
+      return;
+    }
+    launchRazorpay(order);
+  });
+  document.getElementById('confirmation-continue')?.addEventListener('click', closeOrderConfirmation);
+  document.getElementById('confirmation-close')?.addEventListener('click', closeOrderConfirmation);
+  document.querySelectorAll('.payment-option').forEach(option => {
+    option.addEventListener('click', () => {
+      option.parentElement.querySelectorAll('label').forEach(item => item.classList.remove('active'));
+      option.classList.add('active');
+    });
+  });
+  document.getElementById('use-current-location')?.addEventListener('click', () => {
+    const status = document.getElementById('location-status');
+    const locationButton = document.getElementById('use-current-location');
+    const result = document.getElementById('location-result');
+    const accuracyText = document.getElementById('location-accuracy');
+    const mapLink = document.getElementById('location-map-link');
+    const mapWrap = document.getElementById('location-map-wrap');
+    const map = document.getElementById('location-map');
+    const confirmMapLocation = document.getElementById('confirm-map-location');
+    let locationMap;
+    let locationMarker;
+    let selectedMapLocation = null;
+    let geocodeRequestId = 0;
+
+    const fillAddressFromLocation = async (latitude, longitude) => {
+      const requestId = ++geocodeRequestId;
+      if (status) status.textContent = 'Finding the address for this pin...';
+      try {
+        const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${encodeURIComponent(latitude)}&lon=${encodeURIComponent(longitude)}&zoom=18&addressdetails=1`, {
+          headers: { Accept: 'application/json' }
+        });
+        if (!response.ok) throw new Error(`Reverse geocoding failed (${response.status})`);
+        const data = await response.json();
+        if (requestId !== geocodeRequestId) return;
+        const address = data.address || {};
+        const street = [address.house_number, address.road || address.pedestrian || address.neighbourhood].filter(Boolean).join(' ');
+        const area = address.suburb || address.city_district || address.village || '';
+        const city = address.city || address.town || address.municipality || '';
+        const state = address.state || '';
+        const postal = address.postcode || '';
+        const countryCode = (address.country_code || '').toUpperCase();
+        const fields = {
+          'checkout-flat': data.display_name || street,
+          'checkout-area': area,
+          'checkout-city': city,
+          'checkout-state': state,
+          'checkout-pincode': postal,
+          'checkout-country': countryCode
+        };
+        Object.entries(fields).forEach(([id, value]) => {
+          const field = document.getElementById(id);
+          if (field && value) field.value = value;
+        });
+        if (accuracyText) accuracyText.textContent = data.display_name
+          ? `Selected: ${data.display_name}`
+          : 'Address found from selected map pin';
+        if (status) status.textContent = 'Address filled from your selected map location';
+        showToast('📍 Address fields filled from the map pin.', 'success');
+      } catch (error) {
+        if (requestId !== geocodeRequestId) return;
+        if (status) status.textContent = 'Pin selected. Please complete the address fields below.';
+        showToast('📍 Pin selected, but the street address could not be looked up.', 'error');
+      }
+
+    };
+
+    const setMapLocation = (latitude, longitude, accuracy = null, center = true) => {
+      if (!window.L || !map) return;
+      if (!locationMap) {
+        locationMap = window.L.map(map).setView([latitude, longitude], 17);
+        window.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '&copy; OpenStreetMap contributors',
+          maxZoom: 19
+        }).addTo(locationMap);
+        locationMap.on('click', event => setMapLocation(event.latlng.lat, event.latlng.lng, null, false));
+      }
+      if (!locationMarker) {
+        locationMarker = window.L.marker([latitude, longitude], { draggable: true }).addTo(locationMap);
+        locationMarker.on('dragend', event => {
+          const point = event.target.getLatLng();
+          setMapLocation(point.lat, point.lng, null, false);
+        });
+      } else {
+        locationMarker.setLatLng([latitude, longitude]);
+      }
+      selectedMapLocation = { latitude, longitude, accuracy };
+      if (center) locationMap.setView([latitude, longitude], Math.max(locationMap.getZoom(), 17));
+      locationMap.invalidateSize();
+      if (mapLink) {
+        mapLink.href = `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`;
+      }
+      if (confirmMapLocation) confirmMapLocation.disabled = false;
+    };
+
+    confirmMapLocation?.addEventListener('click', () => {
+      if (!selectedMapLocation) return;
+      const { latitude, longitude, accuracy } = selectedMapLocation;
+      const coordinates = document.getElementById('checkout-coordinates');
+      if (coordinates) coordinates.value = `${latitude},${longitude}`;
+      if (status) status.textContent = accuracy
+        ? `Delivery pin confirmed · ±${Math.round(accuracy)} m GPS accuracy`
+        : 'Delivery pin selected on the map';
+      if (accuracyText) accuracyText.textContent = accuracy
+        ? `Selected pin · GPS accuracy: ±${Math.round(accuracy)} metres`
+        : 'Selected pin manually on the map';
+      if (result) result.hidden = false;
+      fillAddressFromLocation(latitude, longitude);
+      showToast('📍 Delivery location confirmed for your order.', 'success');
+    });
+    if (!navigator.geolocation) {
+      if (status) status.textContent = 'Location is not supported by this browser';
+      return;
+    }
+    if (locationButton) {
+      locationButton.disabled = true;
+      locationButton.setAttribute('aria-busy', 'true');
+    }
+    if (result) result.hidden = true;
+    if (status) status.textContent = 'Finding your most accurate location...';
+
+    let bestPosition = null;
+    let watchId;
+    let settled = false;
+    const finish = position => {
+      if (settled || !position) return;
+      settled = true;
+      window.clearTimeout(timeoutId);
+      navigator.geolocation.clearWatch(watchId);
+      const { latitude, longitude, accuracy } = position.coords;
+        if (status) status.textContent = accuracy <= 50
+          ? `GPS found · adjust the pin, then confirm`
+          : `GPS is approximate (±${Math.round(accuracy)} m) · adjust the pin`;
+        if (accuracyText) accuracyText.textContent = `GPS suggestion · ±${Math.round(accuracy)} metres`;
+        const mapUrl = `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`;
+        if (mapLink) {
+          mapLink.href = mapUrl;
+          mapLink.hidden = false;
+        }
+        setMapLocation(latitude, longitude, accuracy);
+        if (mapWrap) mapWrap.hidden = false;
+        if (result) result.hidden = true;
+        fillAddressFromLocation(latitude, longitude);
+        if (locationButton) {
+          locationButton.disabled = false;
+          locationButton.removeAttribute('aria-busy');
+        }
+        showToast('📍 GPS location found. Adjust the pin and confirm it for delivery.', 'success');
+    };
+    const timeoutId = window.setTimeout(() => {
+      if (bestPosition) {
+        finish(bestPosition);
+        return;
+      }
+      settled = true;
+      navigator.geolocation.clearWatch(watchId);
+      if (locationButton) {
+        locationButton.disabled = false;
+        locationButton.removeAttribute('aria-busy');
+      }
+      if (status) status.textContent = 'Location timed out. Please try again outdoors or enter your address manually.';
+      showToast('📍 Could not get an accurate location. Please try again.', 'error');
+    }, 20000);
+    watchId = navigator.geolocation.watchPosition(position => {
+      if (!bestPosition || position.coords.accuracy < bestPosition.coords.accuracy) {
+        bestPosition = position;
+        if (status) status.textContent = `Improving accuracy... ±${Math.round(position.coords.accuracy)} m`;
+        setMapLocation(position.coords.latitude, position.coords.longitude, position.coords.accuracy);
+        if (mapWrap) mapWrap.hidden = false;
+        if (result) result.hidden = true;
+      }
+      if (position.coords.accuracy <= 25) finish(position);
+    }, error => {
+      if (settled) return;
+      settled = true;
+      window.clearTimeout(timeoutId);
+      if (locationButton) {
+        locationButton.disabled = false;
+        locationButton.removeAttribute('aria-busy');
+      }
+      const message = error.code === 1
+        ? 'Location permission was denied. Allow it in your browser and try again.'
+        : error.code === 2
+          ? 'Location is unavailable. Check GPS/Wi-Fi and try again.'
+          : 'Location request timed out. Please try again.';
+      if (status) status.textContent = message;
+      showToast(`📍 ${message}`, 'error');
+    }, {
+      enableHighAccuracy: true,
+      maximumAge: 0,
+      timeout: 25000
+    });
+  });
+}
+
+function initProductDetails() {
+  document.getElementById('product-details-close')?.addEventListener('click', closeProductDetails);
 }
 
 
@@ -482,6 +880,8 @@ document.addEventListener('DOMContentLoaded', () => {
   initNewsletter();
   initSmoothScroll();
   initCartDrawer();
+  initProductDetails();
+  initCheckout();
   initBookingModal();
   animateCounters();
   updateCartBadge();
@@ -489,7 +889,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Register all action-bus handlers (works with data-action delegation)
   import('./cart.js').then(m => {
     window._appBus.register('open-cart', () => { m.openCart(); m.renderCart(); });
-    window._appBus.register('checkout', () => m.showToast('🎉 Redirecting to secure checkout!', 'success'));
+    window._appBus.register('checkout', openCheckout);
     window._appBus.register('cart-continue', () => m.closeCart());
   });
   import('./booking.js').then(m => {

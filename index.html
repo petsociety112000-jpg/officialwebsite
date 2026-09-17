@@ -11,7 +11,7 @@
   <!-- CSS -->
   <link rel="stylesheet" href="css/variables.css">
   <link rel="stylesheet" href="css/main.css">
-  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/components.css?v=2">
   <link rel="stylesheet" href="css/responsive.css">
 
   <!-- Prevent FOUC on reveal elements: mark as JS-pending -->
@@ -34,6 +34,30 @@
      TOAST CONTAINER
      ============================================================ -->
 <div id="toast-container" aria-live="polite"></div>
+
+<!-- ============================================================
+     PRODUCT DETAILS
+     ============================================================ -->
+<aside id="product-details-panel" aria-label="Product details" role="dialog" aria-modal="true">
+  <div class="product-details-box">
+    <button class="product-details-close" id="product-details-close" aria-label="Close product details">✕</button>
+    <div class="product-details-image-wrap">
+      <img id="product-details-image" src="" alt="">
+    </div>
+    <div class="product-details-content">
+      <p class="product-category" id="product-details-category"></p>
+      <h2 id="product-details-name"></h2>
+      <p class="product-details-weight" id="product-details-weight"></p>
+      <div class="product-rating" id="product-details-rating"></div>
+      <p class="product-details-description" id="product-details-description"></p>
+      <div class="product-details-price" id="product-details-price"></div>
+      <div class="product-details-actions">
+        <button class="product-add-btn" id="product-details-add">🛒 Add to Cart</button>
+        <button class="product-buy-btn" id="product-details-buy">⚡ Buy Now</button>
+      </div>
+    </div>
+  </div>
+</aside>
 
 
 <!-- ============================================================
@@ -743,6 +767,166 @@
   </div>
 </aside>
 
+<!-- ============================================================
+     CHECKOUT
+     ============================================================ -->
+<section id="checkout-page" aria-label="Checkout" role="dialog" aria-modal="true">
+  <div class="checkout-shell">
+    <header class="checkout-header">
+      <div>
+        <p class="checkout-kicker">Pet Society Express</p>
+        <h2 class="checkout-title">Secure Checkout</h2>
+      </div>
+      <button class="cart-close" id="checkout-close" aria-label="Close checkout">✕</button>
+    </header>
+
+    <form id="checkout-form" class="checkout-layout">
+      <div class="checkout-main">
+        <section class="checkout-card">
+          <div class="checkout-card-heading">
+            <div>
+              <p class="checkout-step">1. Contact details</p>
+              <h3>Customer information</h3>
+            </div>
+            <span class="required-note">All fields required</span>
+          </div>
+          <div class="checkout-address-fields">
+            <div class="checkout-field-row">
+              <label>First name<input id="checkout-first-name" name="first-name" autocomplete="given-name" required placeholder="e.g. Priya"></label>
+              <label>Last name<input id="checkout-last-name" name="last-name" autocomplete="family-name" required placeholder="e.g. Sharma"></label>
+            </div>
+            <div class="checkout-field-row">
+              <label>Phone number<input id="checkout-phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" pattern="[6-9][0-9]{9}" required placeholder="10-digit mobile number"></label>
+              <label>Email address<input id="checkout-email" name="email" type="email" autocomplete="email" required placeholder="you@example.com"></label>
+            </div>
+          </div>
+          <p class="field-help">We’ll use these details for order confirmation and delivery updates.</p>
+        </section>
+
+        <section class="checkout-card checkout-location-card">
+          <div class="checkout-card-heading">
+            <div>
+              <p class="checkout-step">2. Billing & delivery address</p>
+            </div>
+            <span class="required-note">One address for both</span>
+          </div>
+          <button type="button" class="current-location-btn" id="use-current-location">
+            <span class="current-location-icon">⌖</span>
+            <span>
+              <strong>Use current location</strong>
+              <small id="location-status">Use your live location or choose a pin on the map</small>
+            </span>
+            <span class="current-location-arrow">›</span>
+          </button>
+          <div class="location-result" id="location-result" hidden>
+            <span>✓</span>
+            <span id="location-accuracy">Location ready</span>
+            <a id="location-map-link" href="#" target="_blank" rel="noopener">Open full map ↗</a>
+          </div>
+          <div class="location-map-wrap" id="location-map-wrap" hidden>
+            <div id="location-map" class="location-map" aria-label="Select delivery location on map"></div>
+            <div class="location-map-hint">Tap the map or drag the pin to your exact entrance</div>
+            <button type="button" class="confirm-location-btn" id="confirm-map-location" disabled>
+              Use this delivery location
+            </button>
+          </div>
+          <div class="checkout-address-fields">
+            <label>Address (Street, P.O. box) *<input id="checkout-flat" name="address" autocomplete="street-address" required placeholder="e.g. 24 Lake View Road"></label>
+            <label>Address line 2 <span class="optional-label">(Apartment, suite, unit)</span><input id="checkout-area" name="address-line2" autocomplete="address-line2" placeholder="e.g. Flat 402, Palm Heights"></label>
+            <div class="checkout-field-row">
+              <label>City *<input id="checkout-city" name="city" autocomplete="address-level2" required value="Bengaluru"></label>
+              <label>Country/Region *<select id="checkout-country" name="country" autocomplete="country" required><option value="">Choose your country/region</option><option value="IN" selected>India</option><option value="US">United States</option><option value="GB">United Kingdom</option><option value="AE">United Arab Emirates</option><option value="SG">Singapore</option></select></label>
+            </div>
+            <div class="checkout-field-row">
+              <label>State/Province<input id="checkout-state" name="state" autocomplete="address-level1" placeholder="Required for certain countries"></label>
+              <label>Postal/Zip code *<input id="checkout-pincode" name="postal-code" autocomplete="postal-code" required inputmode="numeric" pattern="[0-9]{5,9}" placeholder="560038"></label>
+            </div>
+            <label>VAT/GST ID <span class="optional-label">(Optional)</span><input id="checkout-gst" name="gst-id" autocomplete="off" pattern="[0-9A-Z]{15}" placeholder="15-character GSTIN, if applicable"></label>
+            <input type="hidden" id="checkout-coordinates">
+          </div>
+          <p class="field-help">This single address will be used for delivery and your order invoice.</p>
+        </section>
+
+        <section class="checkout-card">
+          <div class="checkout-card-heading">
+            <div>
+              <p class="checkout-step">3. Payment</p>
+              <h3>Pay securely</h3>
+            </div>
+          </div>
+          <div class="payment-options">
+            <label class="payment-option active"><input type="radio" name="payment-method" value="UPI" checked><span>◎</span><strong>UPI (Demo)</strong><small>Test payment for this demo store</small></label>
+            <label class="payment-option"><input type="radio" name="payment-method" value="Cash on delivery"><span>₹</span><strong>Cash</strong><small>Pay on delivery</small></label>
+          </div>
+          <div id="upi-details" class="payment-details">
+            <label>Demo UPI ID<input id="checkout-upi" name="upi-id" inputmode="email" required pattern="[a-zA-Z0-9._]+@[a-zA-Z]{2,}" placeholder="demo@upi"></label>
+            <small>Use any test ID such as <strong>demo@upi</strong>. No real money is charged.</small>
+          </div>
+          <p class="field-help">Demo mode: the order is marked paid locally for testing. No real payment is processed.</p>
+        </section>
+      </div>
+
+      <aside class="checkout-summary checkout-card">
+        <p class="checkout-step">Your order</p>
+        <div id="checkout-items" class="checkout-items"></div>
+        <div class="checkout-summary-lines">
+          <div><span>Item total</span><strong id="checkout-item-total">₹0</strong></div>
+          <div><span>Delivery fee</span><strong class="checkout-free">FREE</strong></div>
+          <div><span>Taxes & fees</span><strong>₹0</strong></div>
+        </div>
+        <div class="checkout-total"><span>To pay</span><strong id="checkout-total">₹0</strong></div>
+        <button class="place-order-btn" type="submit">Place Order <span>→</span></button>
+        <p class="checkout-safe">🧪 Demo UPI payment · No real money is charged</p>
+      </aside>
+    </form>
+  </div>
+</section>
+
+<!-- ============================================================
+     ORDER CONFIRMATION
+     ============================================================ -->
+<section id="order-confirmation" aria-label="Order confirmation" role="dialog" aria-modal="true">
+  <div class="order-confirmation-shell">
+    <div class="order-success-icon">✓</div>
+    <p class="checkout-kicker">Pet Society Express</p>
+    <h2 class="checkout-title">Order confirmed!</h2>
+    <p class="order-confirmation-lead">Thanks, <strong id="confirmation-customer"></strong>. Your order is being prepared with care.</p>
+    <div class="order-meta">
+      <span>Order <strong id="confirmation-order-id"></strong></span>
+      <span id="confirmation-eta">Arriving in 20–35 min</span>
+    </div>
+
+    <div class="order-tracking checkout-card">
+      <div class="tracking-step complete"><span>✓</span><div><strong>Order placed</strong><small id="confirmation-placed-time"></small></div></div>
+      <div class="tracking-line"></div>
+      <div class="tracking-step active"><span>2</span><div><strong>Preparing your order</strong><small>Our team is packing your pet essentials</small></div></div>
+      <div class="tracking-line"></div>
+      <div class="tracking-step"><span>3</span><div><strong>Out for delivery</strong><small>We’ll notify you when it’s on the way</small></div></div>
+      <div class="tracking-line"></div>
+      <div class="tracking-step"><span>4</span><div><strong>Delivered</strong><small>Enjoy your order!</small></div></div>
+    </div>
+
+    <div class="confirmation-grid">
+      <div class="checkout-card">
+        <p class="checkout-step">Delivery details</p>
+        <p id="confirmation-address" class="confirmation-detail"></p>
+        <p id="confirmation-contact" class="confirmation-detail"></p>
+        <p id="confirmation-payment" class="confirmation-detail"></p>
+      </div>
+      <div class="checkout-card">
+        <p class="checkout-step">Order summary</p>
+        <div id="confirmation-items" class="confirmation-items"></div>
+        <div class="checkout-total"><span>Total paid</span><strong id="confirmation-total"></strong></div>
+      </div>
+    </div>
+
+    <div class="confirmation-actions">
+      <button class="btn btn-primary" id="confirmation-continue">Continue shopping</button>
+      <button class="btn btn-secondary" id="confirmation-close">Close</button>
+    </div>
+  </div>
+</section>
+
 
 <!-- ============================================================
      BOOKING MODAL
@@ -860,6 +1044,13 @@
     // Mark body as JS-loaded for progressive reveal
     document.documentElement.classList.add('js-loaded');
   })();
+</script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+  // Add your Razorpay Test Key ID here. Never add the Key Secret to frontend code.
+  window.PET_SOCIETY_CONFIG = { razorpayKeyId: 'rzp_test_REPLACE_WITH_KEY_ID' };
 </script>
 <script type="module" src="js/app.js"></script>
 
