@@ -855,14 +855,26 @@
             </div>
           </div>
           <div class="payment-options">
-            <label class="payment-option active"><input type="radio" name="payment-method" value="UPI" checked><span>◎</span><strong>UPI (Demo)</strong><small>Test payment for this demo store</small></label>
-            <label class="payment-option"><input type="radio" name="payment-method" value="Cash on delivery"><span>₹</span><strong>Cash</strong><small>Pay on delivery</small></label>
+            <label class="payment-option active">
+              <input type="radio" name="payment-method" value="Online payment" checked>
+              <span class="payment-option-icon" aria-hidden="true">▣</span>
+              <strong>Pay online</strong>
+              <small>UPI · Cards · Wallets · Netbanking</small>
+              <em>Secure Razorpay checkout</em>
+            </label>
+            <label class="payment-option">
+              <input type="radio" name="payment-method" value="Cash on delivery">
+              <span class="payment-option-icon" aria-hidden="true">₹</span>
+              <strong>Cash on delivery</strong>
+              <small>Pay when your order arrives</small>
+              <em>Available at selected locations</em>
+            </label>
           </div>
-          <div id="upi-details" class="payment-details">
-            <label>Demo UPI ID<input id="checkout-upi" name="upi-id" inputmode="email" required pattern="[a-zA-Z0-9._]+@[a-zA-Z]{2,}" placeholder="demo@upi"></label>
-            <small>Use any test ID such as <strong>demo@upi</strong>. No real money is charged.</small>
+          <div class="payment-trust">
+            <span aria-hidden="true">🔒</span>
+            <span>Your payment is encrypted and processed securely. We never store your card or UPI details.</span>
           </div>
-          <p class="field-help">Demo mode: the order is marked paid locally for testing. No real payment is processed.</p>
+          <p class="field-help">Online payments open a secure Razorpay window. Cash on delivery confirms the order immediately.</p>
         </section>
       </div>
 
@@ -876,7 +888,7 @@
         </div>
         <div class="checkout-total"><span>To pay</span><strong id="checkout-total">₹0</strong></div>
         <button class="place-order-btn" type="submit">Place Order <span>→</span></button>
-        <p class="checkout-safe">🧪 Demo UPI payment · No real money is charged</p>
+        <p class="checkout-safe">🔒 Secure payment · Your details are protected</p>
       </aside>
     </form>
   </div>

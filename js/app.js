@@ -624,12 +624,11 @@ function initCheckout() {
       showToast(`🎉 Order ${orderId} confirmed.`, 'success');
       return;
     }
-    if (paymentMethod === 'UPI') {
-      completeOrder({ ...order, paymentMethod: 'UPI (Demo)' });
-      showToast(`✅ Demo UPI payment successful. Order ${orderId} confirmed.`, 'success');
+    if (paymentMethod === 'Online payment') {
+      launchRazorpay(order);
       return;
     }
-    launchRazorpay(order);
+    showToast('Please select a payment method and try again.', 'error');
   });
   document.getElementById('confirmation-continue')?.addEventListener('click', closeOrderConfirmation);
   document.getElementById('confirmation-close')?.addEventListener('click', closeOrderConfirmation);
@@ -637,6 +636,13 @@ function initCheckout() {
     option.addEventListener('click', () => {
       option.parentElement.querySelectorAll('label').forEach(item => item.classList.remove('active'));
       option.classList.add('active');
+      const paymentMethod = option.querySelector('input')?.value;
+      const safeNote = document.querySelector('.checkout-safe');
+      if (safeNote) {
+        safeNote.textContent = paymentMethod === 'Cash on delivery'
+          ? '📦 Pay safely when your order arrives'
+          : '🔒 Secure payment · Your details are protected';
+      }
     });
   });
   document.getElementById('use-current-location')?.addEventListener('click', () => {
