@@ -37,9 +37,19 @@
 .logo {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
   flex-shrink: 0;
   text-decoration: none;
+}
+
+.logo-image {
+  display: block;
+  width: 174px;
+  height: 54px;
+  object-fit: contain;
+}
+
+.logo:hover .logo-image {
+  transform: scale(1.03);
 }
 
 .logo-icon {
@@ -1658,6 +1668,12 @@
 .footer-brand .logo-icon {
   background: linear-gradient(135deg, rgba(255,255,255,0.2), rgba(255,255,255,0.1));
   box-shadow: none;
+}
+
+.footer-brand .logo-image {
+  background: var(--color-white);
+  border-radius: var(--radius-md);
+  padding: 0.25rem 0.5rem;
 }
 
 .footer-brand .logo-text span:first-child { color: var(--color-white); }

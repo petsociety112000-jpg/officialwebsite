@@ -142,6 +142,7 @@
   }
 
   .logo-text { display: none; }
+  .logo-image { width: 148px; height: 48px; }
   #toast-container { top: calc(var(--header-height) + var(--space-3)); right: var(--space-3); left: var(--space-3); }
   .toast { min-width: 0; }
 
