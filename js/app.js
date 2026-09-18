@@ -505,9 +505,10 @@ function closeCheckout() {
 }
 
 function showOrderConfirmation(order) {
+  const placedOrder = { ...order, placedAt: order.placedAt || new Date().toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' }) };
   document.getElementById('confirmation-customer').textContent = order.customerName;
   document.getElementById('confirmation-order-id').textContent = order.orderId;
-  document.getElementById('confirmation-placed-time').textContent = order.placedAt;
+  document.getElementById('confirmation-placed-time').textContent = placedOrder.placedAt;
   document.getElementById('confirmation-address').textContent = `${order.address}, ${order.city}, ${order.country} - ${order.postal}`;
   document.getElementById('confirmation-contact').textContent = order.email || order.phone
     ? `${order.email} · ${order.phone}`
@@ -517,6 +518,7 @@ function showOrderConfirmation(order) {
   document.getElementById('confirmation-items').innerHTML = order.items.map(item =>
     `<div class="confirmation-item"><span>${item.name} × ${item.qty}</span><strong>₹${(item.price * item.qty).toLocaleString('en-IN')}</strong></div>`
   ).join('');
+  document.getElementById('confirmation-whatsapp')?.setAttribute('data-order-id', order.orderId);
   document.getElementById('checkout-page')?.classList.remove('open');
   document.getElementById('order-confirmation')?.classList.add('open');
   document.getElementById('overlay')?.classList.remove('active');
@@ -529,12 +531,73 @@ function closeOrderConfirmation() {
 }
 
 function completeOrder(order) {
-  localStorage.setItem('petSocietyLastOrder', JSON.stringify(order));
+  const placedOrder = { ...order, placedAt: new Date().toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' }) };
+  const orders = JSON.parse(localStorage.getItem('petSocietyOrders') || '[]');
+  localStorage.setItem('petSocietyOrders', JSON.stringify([placedOrder, ...orders].slice(0, 20)));
+  localStorage.setItem('petSocietyLastOrder', JSON.stringify(placedOrder));
   cartState.items = [];
   updateCartBadge();
   renderCart();
   closeCheckout();
-  showOrderConfirmation({ ...order, placedAt: new Date().toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' }) });
+  showOrderConfirmation(placedOrder);
+  setTimeout(() => openOrderWhatsApp(placedOrder), 500);
+}
+
+function openOrderWhatsApp(order) {
+  const items = order.items.map(item => `${item.name} x${item.qty}`).join(', ');
+  const message = [
+    'Hello Pet Society! I have placed an order.',
+    `Order ID: ${order.orderId}`,
+    `Items: ${items}`,
+    `Total: ₹${order.total.toLocaleString('en-IN')}`,
+    `Payment: ${order.paymentMethod}`,
+    `Delivery: ${order.address}, ${order.city} - ${order.postal}`
+  ].join('\n');
+  window.open(`https://wa.me/917406365606?text=${encodeURIComponent(message)}`, '_blank', 'noopener');
+}
+
+function renderOrders() {
+  const list = document.getElementById('orders-list');
+  if (!list) return;
+  const orders = JSON.parse(localStorage.getItem('petSocietyOrders') || '[]');
+  if (!orders.length) {
+    list.innerHTML = '<div class="orders-empty"><div>📦</div><h3>No orders yet</h3><p>Your completed orders will appear here.</p><button class="btn btn-primary" id="orders-shop-btn">Start shopping</button></div>';
+    document.getElementById('orders-shop-btn')?.addEventListener('click', closeOrders);
+    return;
+  }
+  list.innerHTML = orders.map(order => `
+    <article class="order-history-card">
+      <div class="order-history-top"><div><strong>Order ${order.orderId}</strong><small>${order.placedAt}</small></div><strong>₹${order.total.toLocaleString('en-IN')}</strong></div>
+      <p>${order.items.map(item => `${item.name} × ${item.qty}`).join(', ')}</p>
+      <div class="order-history-bottom"><span>${order.paymentMethod}</span><button class="btn btn-whatsapp order-whatsapp" data-order-id="${order.orderId}">💬 WhatsApp</button></div>
+    </article>
+  `).join('');
+  list.querySelectorAll('.order-whatsapp').forEach(button => {
+    button.addEventListener('click', () => {
+      const order = orders.find(item => item.orderId === button.dataset.orderId);
+      if (order) openOrderWhatsApp(order);
+    });
+  });
+}
+
+function openOrders() {
+  renderOrders();
+  document.getElementById('orders-page')?.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeOrders() {
+  document.getElementById('orders-page')?.classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function initOrders() {
+  document.getElementById('orders-trigger')?.addEventListener('click', openOrders);
+  document.getElementById('mobile-orders-open')?.addEventListener('click', () => {
+    document.getElementById('mobile-nav')?.classList.remove('open');
+    openOrders();
+  });
+  document.getElementById('orders-close')?.addEventListener('click', closeOrders);
 }
 
 function launchRazorpay(order) {
@@ -632,6 +695,11 @@ function initCheckout() {
   });
   document.getElementById('confirmation-continue')?.addEventListener('click', closeOrderConfirmation);
   document.getElementById('confirmation-close')?.addEventListener('click', closeOrderConfirmation);
+  document.getElementById('confirmation-whatsapp')?.addEventListener('click', () => {
+    const orders = JSON.parse(localStorage.getItem('petSocietyOrders') || '[]');
+    const order = orders.find(item => item.orderId === document.getElementById('confirmation-whatsapp').dataset.orderId);
+    if (order) openOrderWhatsApp(order);
+  });
   document.querySelectorAll('.payment-option').forEach(option => {
     option.addEventListener('click', () => {
       option.parentElement.querySelectorAll('label').forEach(item => item.classList.remove('active'));
@@ -894,6 +962,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initCartDrawer();
   initProductDetails();
   initCheckout();
+  initOrders();
   initBookingModal();
   animateCounters();
   updateCartBadge();

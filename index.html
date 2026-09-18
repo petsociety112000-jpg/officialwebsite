@@ -97,6 +97,7 @@
           🛒
           <span class="badge-counter" id="cart-badge" style="display:none">0</span>
         </button>
+        <button class="nav-icon-btn orders-trigger" id="orders-trigger" aria-label="My orders">📦</button>
         <button class="btn btn-primary btn-sm nav-book-btn" id="book-trigger" data-action="open-booking">
           Book Spa
         </button>
@@ -139,6 +140,9 @@
     </button>
     <button class="btn btn-secondary" id="mobile-cart-open" data-action="open-cart" data-close-mobile="true">
       🛒 View Cart
+    </button>
+    <button class="btn btn-secondary" id="mobile-orders-open" data-close-mobile="true">
+      📦 My Orders
     </button>
   </div>
 </nav>
@@ -841,7 +845,6 @@
               <label>State/Province<input id="checkout-state" name="state" autocomplete="address-level1" placeholder="Required for certain countries"></label>
               <label>Postal/Zip code *<input id="checkout-pincode" name="postal-code" autocomplete="postal-code" required inputmode="numeric" pattern="[0-9]{5,9}" placeholder="560038"></label>
             </div>
-            <label>VAT/GST ID <span class="optional-label">(Optional)</span><input id="checkout-gst" name="gst-id" autocomplete="off" pattern="[0-9A-Z]{15}" placeholder="15-character GSTIN, if applicable"></label>
             <input type="hidden" id="checkout-coordinates">
           </div>
           <p class="field-help">This single address will be used for delivery and your order invoice.</p>
@@ -895,6 +898,22 @@
 </section>
 
 <!-- ============================================================
+     MY ORDERS
+     ============================================================ -->
+<section id="orders-page" aria-label="My orders" role="dialog" aria-modal="true">
+  <div class="orders-shell">
+    <header class="checkout-header">
+      <div>
+        <p class="checkout-kicker">Pet Society Express</p>
+        <h2 class="checkout-title">My Orders</h2>
+      </div>
+      <button class="cart-close" id="orders-close" aria-label="Close my orders">✕</button>
+    </header>
+    <div id="orders-list" class="orders-list"></div>
+  </div>
+</section>
+
+<!-- ============================================================
      ORDER CONFIRMATION
      ============================================================ -->
 <section id="order-confirmation" aria-label="Order confirmation" role="dialog" aria-modal="true">
@@ -933,6 +952,7 @@
     </div>
 
     <div class="confirmation-actions">
+      <button class="btn btn-whatsapp" id="confirmation-whatsapp">💬 Send order on WhatsApp</button>
       <button class="btn btn-primary" id="confirmation-continue">Continue shopping</button>
       <button class="btn btn-secondary" id="confirmation-close">Close</button>
     </div>
@@ -1015,6 +1035,12 @@
 
   </div>
 </div>
+
+
+<a class="whatsapp-fab" id="whatsapp-support" href="https://wa.me/917406365606?text=Hello%20Pet%20Society%2C%20I%20need%20help%20with%20my%20order." target="_blank" rel="noopener" aria-label="Chat with Pet Society on WhatsApp">
+  <span aria-hidden="true">💬</span>
+  <span>Need help?</span>
+</a>
 
 
 <!-- ============================================================

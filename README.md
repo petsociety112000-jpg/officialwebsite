@@ -23,6 +23,7 @@ A modern, responsive web application for **Pet Society** — a premier cage-free
 - **Dynamic Category Filtering**: Instant client-side filtering (Dog Food, Cat Nutrition, Treats, Grooming, Accessories) with badges (*Best Seller*, *New*, *Sale*).
 - **Two-Stage Product Browsing**: Click a product once for a quick in-page preview, then click the preview content to open the complete product detail page.
 - **Persistent Shopping Cart**: Slide-out cart drawer with quantity adjustments, item removal, price calculation, and LocalStorage persistence.
+- **My Orders**: Customers can review their completed orders locally in the browser, including order items, totals, payment method, and WhatsApp support.
 - **Interactive Wishlist**: Save favorite items with quick toggle and counter badges.
 - **Razorpay Checkout**: Razorpay-hosted test-mode payment window for UPI, cards, wallets, and net banking.
 
@@ -32,6 +33,7 @@ A modern, responsive web application for **Pet Society** — a premier cage-free
 - **Customer Reviews & Testimonials**: Verified ratings and testimonials from pet parents.
 - **Fully Responsive**: Mobile-first fluid layouts with dedicated mobile navigation drawer and touch-friendly controls.
 - **Micro-Interactions & Animations**: Smooth scroll reveals, dynamic badge counters, and animated toast alerts.
+- **WhatsApp Support**: Order confirmations can open a prefilled WhatsApp message to customer support. Browsers require the customer to tap Send; websites cannot send WhatsApp messages silently.
 
 ---
 

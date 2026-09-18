@@ -228,6 +228,10 @@
   .tracking-line { width: 2px; height: 18px; min-height: 18px; margin: 0 0 0 13px; }
   .confirmation-grid { grid-template-columns: 1fr; }
   .confirmation-actions { flex-direction: column; }
+  .orders-shell { padding-top: var(--space-4); }
+  .order-history-card { padding: var(--space-4); }
+  .order-history-top { align-items: flex-start; }
+  .whatsapp-fab { right: var(--space-3); bottom: var(--space-3); padding: 0.7rem 0.85rem; }
 }
 
 
