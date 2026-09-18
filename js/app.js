@@ -414,7 +414,7 @@ function initTeam() {
   if (!grid) return;
 
   grid.innerHTML = TEAM.map((member, i) => `
-    <div class="team-card reveal" style="transition-delay:${i * 0.15}s">
+    <div class="team-card" style="transition-delay:${i * 0.15}s">
       <div class="team-avatar">
         <img src="assets/images/team-portraits.jpg"
              alt="${member.name}"
