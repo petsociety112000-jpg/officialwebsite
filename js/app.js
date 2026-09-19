@@ -614,6 +614,10 @@ async function launchRazorpay(order) {
         items: order.items.map(item => ({ id: item.id, qty: item.qty }))
       })
     });
+    const contentType = response.headers.get('content-type') || '';
+    if (!contentType.includes('application/json')) {
+      throw new Error('Payment server is unavailable. Start the Node.js server with "npm start" and try again.');
+    }
     const razorpayOrder = await response.json();
     if (!response.ok) throw new Error(razorpayOrder.error || 'Unable to start payment.');
 
