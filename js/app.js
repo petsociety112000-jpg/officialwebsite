@@ -600,41 +600,96 @@ function initOrders() {
   document.getElementById('orders-close')?.addEventListener('click', closeOrders);
 }
 
-function launchRazorpay(order) {
-  const keyId = window.PET_SOCIETY_CONFIG?.razorpayKeyId;
-  if (!keyId || keyId.includes('REPLACE_WITH')) {
-    showToast('Payment gateway is not configured. Add a Razorpay Test Key ID first.', 'error');
-    return;
-  }
+async function launchRazorpay(order) {
   if (typeof window.Razorpay !== 'function') {
     showToast('Razorpay could not load. Check your internet connection and try again.', 'error');
     return;
   }
-  const razorpay = new window.Razorpay({
-    key: keyId,
-    amount: order.total * 100,
-    currency: 'INR',
-    name: 'Pet Society',
-    description: `Pet Society order ${order.orderId}`,
-    prefill: {
-      ...(order.customerName ? { name: order.customerName } : {}),
-      ...(order.email ? { email: order.email } : {}),
-      ...(order.phone ? { contact: order.phone } : {})
-    },
-    notes: { order_id: order.orderId },
-    method: { upi: true, card: true, wallet: true, netbanking: true },
-    theme: { color: '#0B6B7B' },
-    handler: response => {
-      completeOrder({ ...order, paymentMethod: `Razorpay (${response.razorpay_payment_id})` });
-    },
-    modal: {
-      ondismiss: () => showToast('Payment cancelled. Your cart is still saved.', 'error')
-    }
-  });
-  razorpay.on('payment.failed', response => {
-    showToast(`Payment failed: ${response.error?.description || 'Please try again.'}`, 'error');
-  });
-  razorpay.open();
+  try {
+    const response = await fetch('/api/razorpay/orders', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        receipt: order.orderId,
+        items: order.items.map(item => ({ id: item.id, qty: item.qty }))
+      })
+    });
+    const razorpayOrder = await response.json();
+    if (!response.ok) throw new Error(razorpayOrder.error || 'Unable to start payment.');
+
+    const razorpay = new window.Razorpay({
+      key: razorpayOrder.keyId,
+      order_id: razorpayOrder.id,
+      amount: razorpayOrder.amount,
+      currency: razorpayOrder.currency,
+      name: 'Pet Society',
+      description: `Pet Society order ${order.orderId}`,
+      prefill: {
+        ...(order.customerName ? { name: order.customerName } : {}),
+        ...(order.email ? { email: order.email } : {}),
+        ...(order.phone ? { contact: order.phone } : {})
+      },
+      notes: { order_id: order.orderId },
+      method: { upi: true, card: true, wallet: true, netbanking: true },
+      config: {
+        display: {
+          blocks: {
+            upi_methods: {
+              name: 'UPI',
+              instruments: [
+                { method: 'upi', flows: ['intent', 'qr'] }
+              ]
+            },
+            card_methods: {
+              name: 'Cards',
+              instruments: [{ method: 'card' }]
+            },
+            wallet_methods: {
+              name: 'Wallets',
+              instruments: [{ method: 'wallet' }]
+            },
+            netbanking_methods: {
+              name: 'Netbanking',
+              instruments: [{ method: 'netbanking' }]
+            }
+          },
+          sequence: [
+            'block.upi_methods',
+            'block.card_methods',
+            'block.wallet_methods',
+            'block.netbanking_methods'
+          ],
+          preferences: { show_default_blocks: false }
+        }
+      },
+      theme: { color: '#0B6B7B' },
+      handler: async payment => {
+        try {
+          const verification = await fetch('/api/razorpay/verify', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payment)
+          });
+          const result = await verification.json();
+          if (!verification.ok || !result.verified) {
+            throw new Error(result.error || 'Payment verification failed.');
+          }
+          completeOrder({ ...order, paymentMethod: `Razorpay (${payment.razorpay_payment_id})` });
+        } catch (error) {
+          showToast(error.message || 'Payment verification failed. Please contact support.', 'error');
+        }
+      },
+      modal: {
+        ondismiss: () => showToast('Payment cancelled. Your cart is still saved.', 'error')
+      }
+    });
+    razorpay.on('payment.failed', response => {
+      showToast(`Payment failed: ${response.error?.description || 'Please try again.'}`, 'error');
+    });
+    razorpay.open();
+  } catch (error) {
+    showToast(error.message || 'Unable to start payment. Please try again.', 'error');
+  }
 }
 
 function renderCheckout() {

@@ -5,7 +5,7 @@
   "main": "index.html",
   "scripts": {
     "dev": "serve .",
-    "start": "serve ."
+    "start": "node server.js"
   },
   "keywords": [
     "pet-care",
@@ -16,6 +16,11 @@
   ],
   "author": "Varun Kshatriya",
   "license": "MIT",
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "razorpay": "^2.9.6"
+  },
   "devDependencies": {
     "serve": "^14.2.4"
   }

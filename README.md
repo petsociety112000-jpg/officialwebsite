@@ -100,20 +100,28 @@ A modern web browser (Google Chrome, Firefox, Microsoft Edge, Safari).
 - **Styling**: Vanilla CSS3 utilizing CSS Custom Properties (CSS variables), Flexbox, and CSS Grid.
 - **Scripting**: Modern Vanilla JavaScript (ES6+ Modules, LocalStorage API, DOM Manipulation).
 
-### Razorpay test-mode setup
+### Razorpay setup
 
-The checkout loads Razorpay Checkout and uses a client-side **Test Key ID** only. In
-`index.html`, replace `rzp_test_REPLACE_WITH_KEY_ID` in `window.PET_SOCIETY_CONFIG`
-with the Key ID from the Razorpay dashboard. Never put the Razorpay Key Secret in
-this repository or in browser code.
+Online checkout uses a Node.js/Express backend to create Razorpay Orders and
+verify `razorpay_signature` before the browser shows an order confirmation. The
+Razorpay Key Secret is only read by the server and must never be added to
+frontend code or committed.
 
-The checkout sends online payments to the Razorpay-hosted window; it does not
-collect or store card/UPI details in this site. The current static-site
-integration can be tested with a configured Test Key ID and shows confirmation
-after Razorpay reports success. For production, add a server endpoint that
-creates a Razorpay Order, verifies `razorpay_signature` on the server, and only
-then marks the order paid. Do not treat a browser callback alone as payment
-verification.
+1. Copy `.env.example` to `.env`.
+2. Add the Razorpay **Key ID** and **Key Secret** from the Razorpay dashboard.
+   Test credentials use the `rzp_test_` prefix.
+3. Start the site with:
+
+   ```bash
+   npm start
+   ```
+
+The server serves the static site and exposes `/api/razorpay/orders` and
+`/api/razorpay/verify`. The order endpoint calculates the amount from the
+server-side product prices instead of trusting the browser. For production,
+persist pending and paid orders in a database and verify webhook events as an
+additional source of payment state; the sample keeps the existing local order
+history UI and does not replace it with a database.
 
 ---
 

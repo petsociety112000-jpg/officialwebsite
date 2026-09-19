@@ -11,6 +11,9 @@ desktop.ini
 
 # Temporary / Log files
 *.log
+.env
+.env.*
+!.env.example
 
 # Dependencies
 node_modules/
