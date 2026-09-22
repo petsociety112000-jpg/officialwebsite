@@ -29,10 +29,30 @@ const razorpay = razorpayKeyId && razorpayKeySecret
   ? new Razorpay({ key_id: razorpayKeyId, key_secret: razorpayKeySecret })
   : null;
 
+// Enable CORS and preflight
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+  next();
+});
+
 app.use(express.json({ limit: '32kb' }));
 app.use(express.static(path.join(__dirname)));
 
-app.get('/api/qr', async (req, res) => {
+// Health check endpoint for Vercel & local
+app.get(['/api/health', '/health'], (req, res) => {
+  res.json({
+    status: 'ok',
+    environment: process.env.VERCEL ? 'vercel' : 'local',
+    razorpayConfigured: Boolean(razorpayKeyId && razorpayKeySecret)
+  });
+});
+
+app.get(['/api/qr', '/qr'], async (req, res) => {
   const text = req.query.text;
   if (!text) {
     res.status(400).send('Missing text query parameter');
@@ -73,11 +93,13 @@ function getOrderTotal(items) {
 
 function requireRazorpay(res) {
   if (razorpay) return true;
-  res.status(503).json({ error: 'Razorpay is not configured on the server.' });
+  res.status(503).json({
+    error: 'Razorpay is not configured on the server. Please set RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET in Vercel environment variables.'
+  });
   return false;
 }
 
-app.post('/api/razorpay/orders', async (req, res) => {
+app.post(['/api/razorpay/orders', '/razorpay/orders'], async (req, res) => {
   if (!requireRazorpay(res)) return;
 
   const amount = getOrderTotal(req.body?.items);
@@ -101,7 +123,7 @@ app.post('/api/razorpay/orders', async (req, res) => {
   }
 });
 
-app.post('/api/razorpay/verify', (req, res) => {
+app.post(['/api/razorpay/verify', '/razorpay/verify'], (req, res) => {
   if (!requireRazorpay(res)) return;
 
   const { razorpay_order_id: orderId, razorpay_payment_id: paymentId, razorpay_signature: signature } = req.body || {};
@@ -124,6 +146,10 @@ app.post('/api/razorpay/verify', (req, res) => {
   res.json({ verified: true, paymentId });
 });
 
-app.listen(port, () => {
-  console.log(`Pet Society server listening on http://localhost:${port}`);
-});
+if (require.main === module) {
+  app.listen(port, () => {
+    console.log(`Pet Society server listening on http://localhost:${port}`);
+  });
+}
+
+module.exports = app;
