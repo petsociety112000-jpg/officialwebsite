@@ -870,17 +870,26 @@
       }
     }
 
+    function getLocalDateString(dInput) {
+      if (!dInput) return '';
+      const d = new Date(dInput);
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
+
     // ---- RENDER ORDERS TABLE -----------------------------------
     function renderOrders() {
       const tbody = document.getElementById('orders-tbody');
       const timeFilter = document.getElementById('time-filter').value;
       const search = document.getElementById('search-input').value.toLowerCase().trim();
 
-      const todayStr = new Date().toISOString().split('T')[0];
+      const todayStr = getLocalDateString(new Date());
 
       let filtered = _orders.filter(order => {
         if (timeFilter === 'today') {
-          const orderDate = order.created_at ? order.created_at.split('T')[0] : '';
+          const orderDate = getLocalDateString(order.created_at);
           if (orderDate !== todayStr) return false;
         }
         if (search) {
@@ -965,7 +974,7 @@
       const timeFilter = document.getElementById('time-filter').value;
       const search = document.getElementById('search-input').value.toLowerCase().trim();
 
-      const todayStr = new Date().toISOString().split('T')[0];
+      const todayStr = getLocalDateString(new Date());
 
       let filtered = _bookings.filter(b => {
         if (timeFilter === 'today' && b.booking_date !== todayStr) return false;

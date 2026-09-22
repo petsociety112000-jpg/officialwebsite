@@ -331,13 +331,15 @@ app.get(['/api/admin/stats', '/admin/stats'], async (req, res) => {
   }
 
   try {
-    // Determine start of today in IST (UTC+5:30)
-    const now = new Date();
-    const utcTime = now.getTime() + now.getTimezoneOffset() * 60000;
-    const istOffset = 5.5 * 3600000;
-    const istNow = new Date(utcTime + istOffset);
-    const todayStr = istNow.toISOString().split('T')[0];
-    const todayStartIso = `${todayStr}T00:00:00.000Z`;
+    // Helper to get YYYY-MM-DD in IST (UTC+5:30)
+    const toIstDateStr = (dInput) => {
+      if (!dInput) return '';
+      const d = new Date(dInput);
+      const istTime = new Date(d.getTime() + 5.5 * 3600000);
+      return istTime.toISOString().split('T')[0];
+    };
+
+    const todayStr = toIstDateStr(new Date());
 
     // Fetch all orders
     const { data: allOrders, error: orderErr } = await supabase
@@ -360,7 +362,7 @@ app.get(['/api/admin/stats', '/admin/stats'], async (req, res) => {
         pendingOrders++;
       }
 
-      if (o.created_at && o.created_at >= todayStartIso) {
+      if (o.created_at && toIstDateStr(o.created_at) === todayStr) {
         todayOrdersCount++;
         todayRevenue += amt;
       }
