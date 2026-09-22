@@ -118,10 +118,24 @@ frontend code or committed.
 
 The server serves the static site and exposes `/api/razorpay/orders` and
 `/api/razorpay/verify`. The order endpoint calculates the amount from the
-server-side product prices instead of trusting the browser. For production,
-persist pending and paid orders in a database and verify webhook events as an
-additional source of payment state; the sample keeps the existing local order
-history UI and does not replace it with a database.
+server-side product prices instead of trusting the browser.
+
+### Supabase Cloud Database setup
+
+Pet Society uses Supabase (PostgreSQL) for persistent cloud storage of orders and grooming bookings.
+
+1. Create a free project at [supabase.com](https://supabase.com/).
+2. Open the **SQL Editor** in Supabase and run the provided script:
+   [`supabase-schema.sql`](supabase-schema.sql)
+3. Go to **Project Settings > API** in your Supabase dashboard and copy:
+   - **Project URL**
+   - **anon / public key**
+4. Add them to your `.env` (and in your **Vercel Project Settings > Environment Variables**):
+   ```env
+   SUPABASE_URL=https://your-project-id.supabase.co
+   SUPABASE_ANON_KEY=your-anon-public-key
+   ```
+5. All completed orders and grooming spa appointments will now automatically sync to your Supabase tables in real-time!
 
 ---
 

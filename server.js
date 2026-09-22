@@ -5,11 +5,15 @@ const path = require('node:path');
 const express = require('express');
 const Razorpay = require('razorpay');
 const QRCode = require('qrcode');
+const { createClient } = require('@supabase/supabase-js');
 
 const app = express();
 const port = Number(process.env.PORT || 3000);
 const razorpayKeyId = process.env.RAZORPAY_KEY_ID;
 const razorpayKeySecret = process.env.RAZORPAY_KEY_SECRET;
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY;
+const supabase = supabaseUrl && supabaseKey ? createClient(supabaseUrl, supabaseKey) : null;
 const products = new Map([
   ['p1', 2499],
   ['p2', 649],
@@ -23,6 +27,10 @@ const products = new Map([
 
 if (!razorpayKeyId || !razorpayKeySecret) {
   console.warn('Razorpay is not configured. Set RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET.');
+}
+
+if (!supabase) {
+  console.warn('Supabase is not configured. Set SUPABASE_URL and SUPABASE_ANON_KEY for cloud database storage.');
 }
 
 const razorpay = razorpayKeyId && razorpayKeySecret
@@ -48,7 +56,8 @@ app.get(['/api/health', '/health'], (req, res) => {
   res.json({
     status: 'ok',
     environment: process.env.VERCEL ? 'vercel' : 'local',
-    razorpayConfigured: Boolean(razorpayKeyId && razorpayKeySecret)
+    razorpayConfigured: Boolean(razorpayKeyId && razorpayKeySecret),
+    supabaseConfigured: Boolean(supabase)
   });
 });
 
@@ -144,6 +153,175 @@ app.post(['/api/razorpay/verify', '/razorpay/verify'], (req, res) => {
     return;
   }
   res.json({ verified: true, paymentId });
+});
+
+// ---- SUPABASE: ORDERS API ----------------------------------
+app.post(['/api/orders', '/orders'], async (req, res) => {
+  const {
+    orderId,
+    customerName,
+    email,
+    phone,
+    address,
+    city,
+    country,
+    postal,
+    paymentMethod,
+    total,
+    items,
+    status
+  } = req.body || {};
+
+  if (!orderId || !customerName || !phone || total == null) {
+    return res.status(400).json({ error: 'Missing required order fields.' });
+  }
+
+  const orderRecord = {
+    order_id: String(orderId),
+    customer_name: String(customerName),
+    email: email ? String(email) : null,
+    phone: String(phone),
+    address: String(address || ''),
+    city: String(city || ''),
+    country: String(country || 'India'),
+    postal: String(postal || ''),
+    payment_method: String(paymentMethod || 'Online payment'),
+    total: Number(total),
+    items: Array.isArray(items) ? items : [],
+    status: String(status || 'confirmed'),
+    created_at: new Date().toISOString()
+  };
+
+  if (supabase) {
+    try {
+      const { data, error } = await supabase
+        .from('orders')
+        .insert([orderRecord])
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Supabase order insert error:', error);
+        return res.status(500).json({ error: error.message, savedLocally: true });
+      }
+
+      return res.status(201).json({ success: true, order: data, source: 'supabase' });
+    } catch (err) {
+      console.error('Supabase orders exception:', err);
+      return res.status(500).json({ error: err.message, savedLocally: true });
+    }
+  }
+
+  // Fallback when Supabase env variables are not yet provided
+  res.json({
+    success: true,
+    warning: 'Supabase credentials not yet configured. Set SUPABASE_URL and SUPABASE_ANON_KEY.',
+    order: orderRecord,
+    source: 'local'
+  });
+});
+
+app.get(['/api/orders', '/orders'], async (req, res) => {
+  if (!supabase) {
+    return res.status(503).json({ error: 'Supabase is not configured on the server.' });
+  }
+
+  try {
+    const { phone, orderId } = req.query;
+    let query = supabase.from('orders').select('*').order('created_at', { ascending: false });
+
+    if (phone) query = query.eq('phone', phone);
+    if (orderId) query = query.eq('order_id', orderId);
+
+    const { data, error } = await query.limit(50);
+    if (error) throw error;
+    res.json({ orders: data });
+  } catch (err) {
+    console.error('Supabase orders fetch error:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ---- SUPABASE: BOOKINGS API --------------------------------
+app.post(['/api/bookings', '/bookings'], async (req, res) => {
+  const {
+    bookingId,
+    serviceId,
+    serviceName,
+    ownerName,
+    phone,
+    petName,
+    bookingDate,
+    timeSlot,
+    notes
+  } = req.body || {};
+
+  if (!ownerName || !phone || !petName || !bookingDate) {
+    return res.status(400).json({ error: 'Missing required booking fields.' });
+  }
+
+  const generatedId = bookingId || `BK${Date.now().toString().slice(-6)}`;
+  const bookingRecord = {
+    booking_id: String(generatedId),
+    service_id: String(serviceId || ''),
+    service_name: String(serviceName || 'Pet Spa Grooming'),
+    owner_name: String(ownerName),
+    phone: String(phone),
+    pet_name: String(petName),
+    booking_date: String(bookingDate),
+    time_slot: String(timeSlot || 'Morning (10:00 AM)'),
+    notes: notes ? String(notes) : null,
+    status: 'confirmed',
+    created_at: new Date().toISOString()
+  };
+
+  if (supabase) {
+    try {
+      const { data, error } = await supabase
+        .from('bookings')
+        .insert([bookingRecord])
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Supabase booking insert error:', error);
+        return res.status(500).json({ error: error.message, savedLocally: true });
+      }
+
+      return res.status(201).json({ success: true, booking: data, source: 'supabase' });
+    } catch (err) {
+      console.error('Supabase bookings exception:', err);
+      return res.status(500).json({ error: err.message, savedLocally: true });
+    }
+  }
+
+  res.json({
+    success: true,
+    warning: 'Supabase credentials not yet configured. Set SUPABASE_URL and SUPABASE_ANON_KEY.',
+    booking: bookingRecord,
+    source: 'local'
+  });
+});
+
+app.get(['/api/bookings', '/bookings'], async (req, res) => {
+  if (!supabase) {
+    return res.status(503).json({ error: 'Supabase is not configured on the server.' });
+  }
+
+  try {
+    const { date, phone } = req.query;
+    let query = supabase.from('bookings').select('*').order('booking_date', { ascending: true });
+
+    if (date) query = query.eq('booking_date', date);
+    if (phone) query = query.eq('phone', phone);
+
+    const { data, error } = await query.limit(50);
+    if (error) throw error;
+    res.json({ bookings: data });
+  } catch (err) {
+    console.error('Supabase bookings fetch error:', err);
+    res.status(500).json({ error: err.message });
+  }
 });
 
 if (require.main === module) {

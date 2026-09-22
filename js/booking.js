@@ -62,10 +62,31 @@ export function submitBooking(e) {
     return;
   }
 
-  // Simulate booking success
+  // Booking confirmation
   const service = SPA_SERVICES.find(s => s.id === selectedService);
+  const bookingId = `BK${Date.now().toString().slice(-6)}`;
   showToast(`🎉 Appointment booked for ${petName}! We'll confirm via SMS.`, 'success');
   closeBooking();
+
+  // Sync to Supabase cloud database
+  fetch('/api/bookings', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      bookingId,
+      serviceId: selectedService,
+      serviceName: service?.name || 'Grooming Spa',
+      ownerName: name,
+      phone,
+      petName,
+      bookingDate: date,
+      notes: `Service: ${service?.name} (${service?.price})`
+    })
+  }).then(r => r.json()).then(res => {
+    console.log('Booking synced to database:', res);
+  }).catch(err => {
+    console.warn('Booking sync deferred:', err);
+  });
 
   // Reset form
   document.getElementById('booking-form')?.reset();

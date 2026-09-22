@@ -541,6 +541,17 @@ function completeOrder(order) {
   closeCheckout();
   showOrderConfirmation(placedOrder);
   setTimeout(() => openOrderWhatsApp(placedOrder), 500);
+
+  // Sync to Supabase cloud database
+  fetch('/api/orders', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(placedOrder)
+  }).then(r => r.json()).then(res => {
+    console.log('Order synced to database:', res);
+  }).catch(err => {
+    console.warn('Database sync deferred (saved in browser):', err);
+  });
 }
 
 function openOrderWhatsApp(order) {
