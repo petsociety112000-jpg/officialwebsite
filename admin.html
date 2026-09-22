@@ -1,0 +1,1106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard | Pet Society</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #0A0E1A;
+      --bg-card: #131B2E;
+      --bg-card-hover: #1A243D;
+      --border-color: rgba(255, 255, 255, 0.08);
+      --border-accent: rgba(37, 99, 235, 0.3);
+      --text-main: #F8FAFC;
+      --text-muted: #94A3B8;
+      --primary: #2563EB;
+      --primary-hover: #1D4ED8;
+      --success: #10B981;
+      --warning: #F59E0B;
+      --purple: #8B5CF6;
+      --danger: #EF4444;
+      --font-heading: 'Outfit', sans-serif;
+      --font-body: 'Inter', sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-family: var(--font-body);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ---- PIN LOCK SCREEN ---- */
+    #lock-screen {
+      position: fixed;
+      inset: 0;
+      background: rgba(10, 14, 26, 0.95);
+      backdrop-filter: blur(12px);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+
+    .lock-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 2.5rem 2rem;
+      width: 100%;
+      max-width: 380px;
+      text-align: center;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+    }
+
+    .lock-icon {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+      display: inline-block;
+      animation: pulseLock 2s infinite ease-in-out;
+    }
+
+    @keyframes pulseLock {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.08); }
+    }
+
+    .lock-box h2 {
+      font-family: var(--font-heading);
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .lock-box p {
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .pin-input {
+      width: 100%;
+      padding: 0.85rem;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      font-size: 1.4rem;
+      letter-spacing: 0.4rem;
+      text-align: center;
+      color: #fff;
+      outline: none;
+      margin-bottom: 1rem;
+      transition: all 0.2s;
+    }
+
+    .pin-input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.25);
+    }
+
+    .pin-btn {
+      width: 100%;
+      padding: 0.85rem;
+      background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .pin-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(37, 99, 235, 0.35);
+    }
+
+    .pin-hint {
+      margin-top: 1rem;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    /* ---- TOP NAVBAR ---- */
+    .admin-nav {
+      background: rgba(19, 27, 46, 0.8);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border-color);
+      padding: 1rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .admin-brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .brand-logo-icon {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, #1A237E, #2563EB);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+    }
+
+    .brand-title {
+      font-family: var(--font-heading);
+      font-size: 1.15rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+    }
+
+    .brand-badge {
+      font-size: 0.65rem;
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--success);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      padding: 2px 8px;
+      border-radius: 20px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .live-dot {
+      width: 6px;
+      height: 6px;
+      background: var(--success);
+      border-radius: 50%;
+      animation: blink 1.5s infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    .admin-nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .btn-nav {
+      padding: 0.5rem 0.85rem;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+
+    .btn-nav-ghost {
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--text-main);
+      border: 1px solid var(--border-color);
+    }
+    .btn-nav-ghost:hover {
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    /* ---- MAIN CONTENT WRAPPER ---- */
+    .admin-container {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 1.75rem 1.25rem 3rem;
+      width: 100%;
+      flex: 1;
+    }
+
+    /* ---- HERO STATS GRID ---- */
+    .stats-header {
+      margin-bottom: 1.25rem;
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .stats-header h1 {
+      font-family: var(--font-heading);
+      font-size: 1.6rem;
+      font-weight: 700;
+    }
+
+    .stats-header span {
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .stat-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 1.25rem 1.35rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      transition: transform 0.2s, border-color 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--border-accent);
+    }
+
+    .stat-card::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+    }
+
+    .stat-card--orders::after { background: var(--primary); }
+    .stat-card--revenue::after { background: var(--success); }
+    .stat-card--bookings::after { background: var(--purple); }
+    .stat-card--pending::after { background: var(--warning); }
+
+    .stat-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .stat-title {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .stat-icon {
+      font-size: 1.25rem;
+    }
+
+    .stat-value {
+      font-family: var(--font-heading);
+      font-size: 1.95rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .stat-value--success { color: #34D399; }
+    .stat-value--primary { color: #60A5FA; }
+    .stat-value--purple { color: #A78BFA; }
+    .stat-value--warning { color: #FBBF24; }
+
+    .stat-footer {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* ---- CONTROLS & TABS ---- */
+    .controls-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-bottom: 1.25rem;
+    }
+
+    .tab-pills {
+      display: flex;
+      background: rgba(255, 255, 255, 0.04);
+      padding: 4px;
+      border-radius: 10px;
+      border: 1px solid var(--border-color);
+      gap: 4px;
+    }
+
+    .tab-btn {
+      padding: 0.55rem 1rem;
+      border-radius: 8px;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+
+    .tab-btn.active {
+      background: var(--bg-card);
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    .tab-count {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 1px 7px;
+      border-radius: 12px;
+      font-size: 0.72rem;
+    }
+
+    .search-filter-wrap {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .search-box {
+      position: relative;
+      min-width: 240px;
+    }
+
+    .search-box input {
+      width: 100%;
+      padding: 0.55rem 0.85rem 0.55rem 2rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      color: #fff;
+      font-size: 0.82rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .search-box input:focus {
+      border-color: var(--primary);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 0.65rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+
+    /* ---- TABLE CARD ---- */
+    .data-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .table-responsive {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.85rem;
+    }
+
+    th {
+      background: rgba(255, 255, 255, 0.02);
+      padding: 0.85rem 1rem;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border-color);
+      white-space: nowrap;
+    }
+
+    td {
+      padding: 1rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      vertical-align: top;
+    }
+
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: rgba(255, 255, 255, 0.02); }
+
+    .order-id-badge {
+      font-family: monospace;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #60A5FA;
+      background: rgba(37, 99, 235, 0.12);
+      padding: 3px 8px;
+      border-radius: 6px;
+      display: inline-block;
+      margin-bottom: 4px;
+    }
+
+    .order-date {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      display: block;
+    }
+
+    .customer-info strong {
+      display: block;
+      font-size: 0.88rem;
+      color: #fff;
+    }
+
+    .customer-info a {
+      color: #38BDF8;
+      text-decoration: none;
+      font-size: 0.78rem;
+    }
+
+    .customer-address {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      max-width: 220px;
+      line-height: 1.3;
+      margin-top: 3px;
+    }
+
+    .items-list {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      font-size: 0.78rem;
+      max-width: 280px;
+    }
+
+    .item-pill {
+      background: rgba(255, 255, 255, 0.04);
+      padding: 3px 8px;
+      border-radius: 6px;
+      display: inline-flex;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .status-select {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-color);
+      color: #fff;
+      padding: 5px 8px;
+      border-radius: 6px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      outline: none;
+    }
+
+    .status-select.confirmed { border-color: #3B82F6; color: #60A5FA; }
+    .status-select.preparing { border-color: #8B5CF6; color: #C084FC; }
+    .status-select.out_for_delivery { border-color: #F59E0B; color: #FBBF24; }
+    .status-select.delivered { border-color: #10B981; color: #34D399; }
+    .status-select.cancelled { border-color: #EF4444; color: #F87171; }
+
+    .btn-wa {
+      background: #25D366;
+      color: #fff;
+      border: none;
+      padding: 5px 9px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      text-decoration: none;
+    }
+    .btn-wa:hover { opacity: 0.9; }
+
+    /* Empty state */
+    .empty-state {
+      padding: 3rem 1rem;
+      text-align: center;
+      color: var(--text-muted);
+    }
+    .empty-icon { font-size: 2.5rem; margin-bottom: 0.5rem; }
+
+    /* Toast alerts */
+    #admin-toast {
+      position: fixed;
+      bottom: 1.5rem;
+      right: 1.5rem;
+      background: #1E293B;
+      color: #fff;
+      border: 1px solid var(--border-color);
+      padding: 0.75rem 1.25rem;
+      border-radius: 10px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 1000;
+    }
+    #admin-toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    @media (max-width: 768px) {
+      .admin-nav { padding: 0.75rem 1rem; }
+      .admin-container { padding: 1rem 0.75rem 2rem; }
+      .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
+      .stat-value { font-size: 1.5rem; }
+      .search-box { min-width: 100%; }
+      .controls-bar { flex-direction: column; align-items: stretch; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- PIN LOCK SCREEN -->
+  <div id="lock-screen">
+    <div class="lock-box">
+      <div class="lock-icon">🔒</div>
+      <h2>Pet Society Admin</h2>
+      <p>Enter your 4-digit security PIN to access live order & booking analytics.</p>
+      <form id="pin-form">
+        <input type="password" id="pin-field" class="pin-input" maxlength="4" placeholder="••••" autocomplete="off" autofocus required>
+        <button type="submit" class="pin-btn">Unlock Dashboard →</button>
+      </form>
+      <div class="pin-hint">Default PIN: <strong>7406</strong></div>
+    </div>
+  </div>
+
+  <!-- TOP NAVBAR -->
+  <header class="admin-nav">
+    <a href="index.html" class="admin-brand">
+      <div class="brand-logo-icon">🐾</div>
+      <div>
+        <div class="brand-title">Pet Society</div>
+        <div class="brand-badge"><span class="live-dot"></span> Live Dashboard</div>
+      </div>
+    </a>
+    <div class="admin-nav-actions">
+      <button class="btn-nav btn-nav-ghost" id="refresh-btn" title="Refresh data">
+        <span id="refresh-icon">🔄</span> <span class="hide-mobile">Refresh</span>
+      </button>
+      <a href="index.html" class="btn-nav btn-nav-ghost" target="_blank">
+        <span>🌐</span> <span class="hide-mobile">Storefront</span>
+      </a>
+      <button class="btn-nav btn-nav-ghost" id="lock-btn" title="Lock Dashboard">
+        <span>🔒</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <main class="admin-container">
+
+    <!-- STATS HERO SECTION -->
+    <div class="stats-header">
+      <div>
+        <h1>Daily Business Overview</h1>
+        <span id="live-date-label">Today's Live Performance</span>
+      </div>
+    </div>
+
+    <div class="stats-grid">
+      <!-- Today's Orders -->
+      <div class="stat-card stat-card--orders">
+        <div class="stat-top">
+          <span class="stat-title">Today's Orders</span>
+          <span class="stat-icon">📦</span>
+        </div>
+        <div class="stat-value stat-value--primary" id="kpi-today-orders">0</div>
+        <div class="stat-footer">
+          <span id="kpi-total-orders">Total all-time: 0 orders</span>
+        </div>
+      </div>
+
+      <!-- Today's Sales -->
+      <div class="stat-card stat-card--revenue">
+        <div class="stat-top">
+          <span class="stat-title">Today's Revenue</span>
+          <span class="stat-icon">💰</span>
+        </div>
+        <div class="stat-value stat-value--success" id="kpi-today-revenue">₹0</div>
+        <div class="stat-footer">
+          <span id="kpi-total-revenue">All-time: ₹0</span>
+        </div>
+      </div>
+
+      <!-- Today's Spa Bookings -->
+      <div class="stat-card stat-card--bookings">
+        <div class="stat-top">
+          <span class="stat-title">Today's Appointments</span>
+          <span class="stat-icon">🛁</span>
+        </div>
+        <div class="stat-value stat-value--purple" id="kpi-today-bookings">0</div>
+        <div class="stat-footer">
+          <span id="kpi-upcoming-bookings">Upcoming scheduled: 0</span>
+        </div>
+      </div>
+
+      <!-- Pending Orders -->
+      <div class="stat-card stat-card--pending">
+        <div class="stat-top">
+          <span class="stat-title">Pending Orders</span>
+          <span class="stat-icon">🚚</span>
+        </div>
+        <div class="stat-value stat-value--warning" id="kpi-pending-orders">0</div>
+        <div class="stat-footer">
+          <span>Awaiting packing or delivery</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONTROLS & TABS -->
+    <div class="controls-bar">
+      <div class="tab-pills">
+        <button class="tab-btn active" data-tab="orders" id="tab-btn-orders">
+          <span>📦 Orders</span>
+          <span class="tab-count" id="count-orders">0</span>
+        </button>
+        <button class="tab-btn" data-tab="bookings" id="tab-btn-bookings">
+          <span>🛁 Spa Bookings</span>
+          <span class="tab-count" id="count-bookings">0</span>
+        </button>
+      </div>
+
+      <div class="search-filter-wrap">
+        <div class="search-box">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="search-input" placeholder="Search customer, phone, order ID...">
+        </div>
+        <select id="time-filter" class="status-select" style="padding: 0.55rem 0.85rem;">
+          <option value="today">📅 Today Only</option>
+          <option value="all">🗓️ All Time</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- ORDERS PANEL -->
+    <section class="data-card" id="orders-view">
+      <div class="table-responsive">
+        <table>
+          <thead>
+            <tr>
+              <th>Order ID</th>
+              <th>Customer</th>
+              <th>Items</th>
+              <th>Amount</th>
+              <th>Payment</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="orders-tbody">
+            <tr>
+              <td colspan="7" class="empty-state">
+                <div class="empty-icon">⏳</div>
+                <p>Loading live orders from Supabase...</p>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- BOOKINGS PANEL -->
+    <section class="data-card" id="bookings-view" style="display: none;">
+      <div class="table-responsive">
+        <table>
+          <thead>
+            <tr>
+              <th>Booking ID</th>
+              <th>Pet &amp; Owner</th>
+              <th>Service</th>
+              <th>Date &amp; Slot</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="bookings-tbody">
+            <tr>
+              <td colspan="6" class="empty-state">
+                <div class="empty-icon">⏳</div>
+                <p>Loading live spa appointments...</p>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+
+  <div id="admin-toast">Status updated</div>
+
+  <script>
+    const ADMIN_PIN = '7406'; // Pet Society Admin PIN
+    let _orders = [];
+    let _bookings = [];
+    let _activeTab = 'orders';
+
+    // ---- PIN AUTH ---------------------------------------------
+    const lockScreen = document.getElementById('lock-screen');
+    const pinForm = document.getElementById('pin-form');
+    const pinField = document.getElementById('pin-field');
+
+    if (sessionStorage.getItem('ps_admin_auth') === 'true') {
+      lockScreen.style.display = 'none';
+      initDashboard();
+    } else {
+      pinForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        if (pinField.value === ADMIN_PIN) {
+          sessionStorage.setItem('ps_admin_auth', 'true');
+          lockScreen.style.display = 'none';
+          initDashboard();
+        } else {
+          pinField.classList.add('error');
+          pinField.value = '';
+          showToast('❌ Incorrect PIN. Please try again.');
+          setTimeout(() => pinField.classList.remove('error'), 1000);
+        }
+      });
+    }
+
+    document.getElementById('lock-btn')?.addEventListener('click', () => {
+      sessionStorage.removeItem('ps_admin_auth');
+      lockScreen.style.display = 'flex';
+      pinField.value = '';
+    });
+
+    // ---- DASHBOARD INIT & DATA FETCH --------------------------
+    function initDashboard() {
+      fetchStats();
+      fetchOrders();
+      fetchBookings();
+      setupTabs();
+      setupSearch();
+
+      document.getElementById('refresh-btn')?.addEventListener('click', () => {
+        const icon = document.getElementById('refresh-icon');
+        if (icon) icon.style.transform = 'rotate(360deg)';
+        fetchStats();
+        fetchOrders();
+        fetchBookings();
+        setTimeout(() => { if (icon) icon.style.transform = 'none'; }, 600);
+      });
+    }
+
+    async function fetchStats() {
+      try {
+        const res = await fetch('/api/admin/stats');
+        if (!res.ok) return;
+        const data = await res.json();
+        
+        document.getElementById('kpi-today-orders').textContent = data.today?.ordersCount || 0;
+        document.getElementById('kpi-today-revenue').textContent = `₹${(data.today?.revenue || 0).toLocaleString('en-IN')}`;
+        document.getElementById('kpi-today-bookings').textContent = data.today?.bookingsCount || 0;
+        document.getElementById('kpi-pending-orders').textContent = data.overall?.pendingOrders || 0;
+
+        document.getElementById('kpi-total-orders').textContent = `Total all-time: ${data.overall?.totalOrders || 0} orders`;
+        document.getElementById('kpi-total-revenue').textContent = `All-time: ₹${(data.overall?.totalRevenue || 0).toLocaleString('en-IN')}`;
+        document.getElementById('kpi-upcoming-bookings').textContent = `Upcoming scheduled: ${data.overall?.upcomingBookings || 0}`;
+
+        const d = new Date();
+        document.getElementById('live-date-label').textContent = `${d.toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'short', year: 'numeric' })} · Live Sync`;
+      } catch (err) {
+        console.warn('Failed to load stats:', err);
+      }
+    }
+
+    async function fetchOrders() {
+      try {
+        const res = await fetch('/api/orders');
+        const data = await res.json();
+        _orders = data.orders || [];
+        document.getElementById('count-orders').textContent = _orders.length;
+        renderOrders();
+      } catch (err) {
+        console.error('Fetch orders error:', err);
+      }
+    }
+
+    async function fetchBookings() {
+      try {
+        const res = await fetch('/api/bookings');
+        const data = await res.json();
+        _bookings = data.bookings || [];
+        document.getElementById('count-bookings').textContent = _bookings.length;
+        renderBookings();
+      } catch (err) {
+        console.error('Fetch bookings error:', err);
+      }
+    }
+
+    // ---- RENDER ORDERS TABLE -----------------------------------
+    function renderOrders() {
+      const tbody = document.getElementById('orders-tbody');
+      const timeFilter = document.getElementById('time-filter').value;
+      const search = document.getElementById('search-input').value.toLowerCase().trim();
+
+      const todayStr = new Date().toISOString().split('T')[0];
+
+      let filtered = _orders.filter(order => {
+        if (timeFilter === 'today') {
+          const orderDate = order.created_at ? order.created_at.split('T')[0] : '';
+          if (orderDate !== todayStr) return false;
+        }
+        if (search) {
+          const matchId = (order.order_id || '').toLowerCase().includes(search);
+          const matchName = (order.customer_name || '').toLowerCase().includes(search);
+          const matchPhone = (order.phone || '').includes(search);
+          if (!matchId && !matchName && !matchPhone) return false;
+        }
+        return true;
+      });
+
+      if (!filtered.length) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="7" class="empty-state">
+              <div class="empty-icon">📦</div>
+              <p>No orders found for this filter.</p>
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(order => {
+        const dateObj = new Date(order.created_at);
+        const dateStr = dateObj.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+        const items = Array.isArray(order.items) ? order.items : [];
+        const itemsHtml = items.map(i => `
+          <div class="item-pill">
+            <span><strong>${i.qty}x</strong> ${i.name}</span>
+            <span>₹${(i.price * i.qty).toLocaleString('en-IN')}</span>
+          </div>
+        `).join('') || '<span style="color:var(--text-muted)">General order</span>';
+
+        const waMsg = encodeURIComponent(`Hello ${order.customer_name}! Updating you on your Pet Society order #${order.order_id}. Current status: ${order.status.toUpperCase()}. Total: ₹${order.total}. Thank you!`);
+
+        return `
+          <tr>
+            <td>
+              <span class="order-id-badge">#${order.order_id}</span>
+              <span class="order-date">${dateStr}</span>
+            </td>
+            <td>
+              <div class="customer-info">
+                <strong>${escapeHtml(order.customer_name)}</strong>
+                <a href="tel:${escapeHtml(order.phone)}">📞 ${escapeHtml(order.phone)}</a>
+                ${order.email ? `<div style="font-size:0.75rem;color:var(--text-muted)">✉️ ${escapeHtml(order.email)}</div>` : ''}
+                <div class="customer-address">📍 ${escapeHtml(order.address)}, ${escapeHtml(order.city || '')} ${escapeHtml(order.postal || '')}</div>
+              </div>
+            </td>
+            <td>
+              <div class="items-list">${itemsHtml}</div>
+            </td>
+            <td>
+              <strong style="font-size:0.95rem;color:#34D399">₹${Number(order.total).toLocaleString('en-IN')}</strong>
+            </td>
+            <td>
+              <span style="font-size:0.75rem;font-weight:600;color:#94A3B8">${escapeHtml(order.payment_method || 'Online')}</span>
+            </td>
+            <td>
+              <select class="status-select ${order.status}" onchange="updateOrderStatus('${order.order_id}', this.value)">
+                <option value="confirmed" ${order.status === 'confirmed' ? 'selected' : ''}>Confirmed</option>
+                <option value="preparing" ${order.status === 'preparing' ? 'selected' : ''}>Preparing</option>
+                <option value="out_for_delivery" ${order.status === 'out_for_delivery' ? 'selected' : ''}>Out for Delivery</option>
+                <option value="delivered" ${order.status === 'delivered' ? 'selected' : ''}>Delivered</option>
+                <option value="cancelled" ${order.status === 'cancelled' ? 'selected' : ''}>Cancelled</option>
+              </select>
+            </td>
+            <td>
+              <a href="https://wa.me/91${order.phone.replace(/[^0-9]/g, '')}?text=${waMsg}" target="_blank" class="btn-wa" title="WhatsApp Customer">
+                💬 WA
+              </a>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // ---- RENDER BOOKINGS TABLE ---------------------------------
+    function renderBookings() {
+      const tbody = document.getElementById('bookings-tbody');
+      const timeFilter = document.getElementById('time-filter').value;
+      const search = document.getElementById('search-input').value.toLowerCase().trim();
+
+      const todayStr = new Date().toISOString().split('T')[0];
+
+      let filtered = _bookings.filter(b => {
+        if (timeFilter === 'today' && b.booking_date !== todayStr) return false;
+        if (search) {
+          const matchPet = (b.pet_name || '').toLowerCase().includes(search);
+          const matchOwner = (b.owner_name || '').toLowerCase().includes(search);
+          const matchPhone = (b.phone || '').includes(search);
+          if (!matchPet && !matchOwner && !matchPhone) return false;
+        }
+        return true;
+      });
+
+      if (!filtered.length) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="6" class="empty-state">
+              <div class="empty-icon">🛁</div>
+              <p>No appointments found for this filter.</p>
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(b => {
+        const waMsg = encodeURIComponent(`Hello ${b.owner_name}! Confirming appointment for your pet ${b.pet_name} on ${b.booking_date} (${b.time_slot}) for ${b.service_name} at Pet Society Grooming Spa.`);
+        return `
+          <tr>
+            <td>
+              <span class="order-id-badge">#${b.booking_id}</span>
+            </td>
+            <td>
+              <div class="customer-info">
+                <strong>🐾 ${escapeHtml(b.pet_name)}</strong>
+                <span style="font-size:0.75rem;color:var(--text-muted)">Owner: ${escapeHtml(b.owner_name)}</span>
+                <a href="tel:${escapeHtml(b.phone)}">📞 ${escapeHtml(b.phone)}</a>
+              </div>
+            </td>
+            <td>
+              <strong style="color:#C084FC">${escapeHtml(b.service_name)}</strong>
+              ${b.notes ? `<div style="font-size:0.72rem;color:var(--text-muted)">${escapeHtml(b.notes)}</div>` : ''}
+            </td>
+            <td>
+              <strong>📅 ${b.booking_date}</strong>
+              <div style="font-size:0.75rem;color:var(--text-muted)">⏰ ${escapeHtml(b.time_slot || 'Morning')}</div>
+            </td>
+            <td>
+              <select class="status-select ${b.status}" onchange="updateBookingStatus('${b.booking_id}', this.value)">
+                <option value="confirmed" ${b.status === 'confirmed' ? 'selected' : ''}>Confirmed</option>
+                <option value="completed" ${b.status === 'completed' ? 'selected' : ''}>Completed</option>
+                <option value="cancelled" ${b.status === 'cancelled' ? 'selected' : ''}>Cancelled</option>
+              </select>
+            </td>
+            <td>
+              <a href="https://wa.me/91${b.phone.replace(/[^0-9]/g, '')}?text=${waMsg}" target="_blank" class="btn-wa">
+                💬 WA
+              </a>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // ---- STATUS UPDATE API CALLS -------------------------------
+    async function updateOrderStatus(orderId, status) {
+      try {
+        const res = await fetch('/api/orders/status', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ orderId, status })
+        });
+        if (!res.ok) throw new Error('Update failed');
+        showToast(`✓ Order #${orderId} marked as ${status.replace(/_/g, ' ')}`);
+        fetchStats();
+      } catch (err) {
+        showToast('❌ Failed to update status in Supabase');
+      }
+    }
+
+    async function updateBookingStatus(bookingId, status) {
+      try {
+        const res = await fetch('/api/bookings/status', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ bookingId, status })
+        });
+        if (!res.ok) throw new Error('Update failed');
+        showToast(`✓ Booking #${bookingId} marked as ${status}`);
+        fetchStats();
+      } catch (err) {
+        showToast('❌ Failed to update booking in Supabase');
+      }
+    }
+
+    // ---- TAB & SEARCH EVENT LISTENERS --------------------------
+    function setupTabs() {
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          _activeTab = btn.dataset.tab;
+
+          document.getElementById('orders-view').style.display = _activeTab === 'orders' ? 'block' : 'none';
+          document.getElementById('bookings-view').style.display = _activeTab === 'bookings' ? 'block' : 'none';
+        });
+      });
+    }
+
+    function setupSearch() {
+      document.getElementById('search-input')?.addEventListener('input', () => {
+        if (_activeTab === 'orders') renderOrders();
+        else renderBookings();
+      });
+
+      document.getElementById('time-filter')?.addEventListener('change', () => {
+        if (_activeTab === 'orders') renderOrders();
+        else renderBookings();
+      });
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('admin-toast');
+      if (toast) {
+        toast.textContent = msg;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 2800);
+      }
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str).replace(/[&<>"']/g, m => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+      }[m]));
+    }
+  </script>
+</body>
+</html>

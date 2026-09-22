@@ -324,6 +324,138 @@ app.get(['/api/bookings', '/bookings'], async (req, res) => {
   }
 });
 
+// ---- ADMIN API ---------------------------------------------
+app.get(['/api/admin/stats', '/admin/stats'], async (req, res) => {
+  if (!supabase) {
+    return res.status(503).json({ error: 'Supabase is not configured.' });
+  }
+
+  try {
+    // Determine start of today in IST (UTC+5:30)
+    const now = new Date();
+    const utcTime = now.getTime() + now.getTimezoneOffset() * 60000;
+    const istOffset = 5.5 * 3600000;
+    const istNow = new Date(utcTime + istOffset);
+    const todayStr = istNow.toISOString().split('T')[0];
+    const todayStartIso = `${todayStr}T00:00:00.000Z`;
+
+    // Fetch all orders
+    const { data: allOrders, error: orderErr } = await supabase
+      .from('orders')
+      .select('order_id, total, status, created_at');
+
+    if (orderErr) throw orderErr;
+
+    const orders = allOrders || [];
+    let todayOrdersCount = 0;
+    let todayRevenue = 0;
+    let totalRevenue = 0;
+    let pendingOrders = 0;
+
+    for (const o of orders) {
+      const amt = Number(o.total) || 0;
+      totalRevenue += amt;
+
+      if (o.status !== 'delivered' && o.status !== 'cancelled') {
+        pendingOrders++;
+      }
+
+      if (o.created_at && o.created_at >= todayStartIso) {
+        todayOrdersCount++;
+        todayRevenue += amt;
+      }
+    }
+
+    // Fetch bookings
+    const { data: allBookings, error: bookErr } = await supabase
+      .from('bookings')
+      .select('booking_id, booking_date, status');
+
+    if (bookErr) throw bookErr;
+
+    const bookings = allBookings || [];
+    let todayBookingsCount = 0;
+    let upcomingBookings = 0;
+
+    for (const b of bookings) {
+      if (b.booking_date === todayStr) {
+        todayBookingsCount++;
+      }
+      if (b.booking_date >= todayStr && b.status !== 'cancelled') {
+        upcomingBookings++;
+      }
+    }
+
+    res.json({
+      todayStr,
+      today: {
+        ordersCount: todayOrdersCount,
+        revenue: todayRevenue,
+        bookingsCount: todayBookingsCount
+      },
+      overall: {
+        totalOrders: orders.length,
+        totalRevenue,
+        pendingOrders,
+        upcomingBookings
+      }
+    });
+  } catch (err) {
+    console.error('Admin stats error:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post(['/api/orders/status', '/orders/status'], async (req, res) => {
+  if (!supabase) return res.status(503).json({ error: 'Supabase is not configured.' });
+
+  const { orderId, status } = req.body || {};
+  const validStatuses = ['confirmed', 'preparing', 'out_for_delivery', 'delivered', 'cancelled'];
+  if (!orderId || !validStatuses.includes(status)) {
+    return res.status(400).json({ error: 'Invalid order status or orderId' });
+  }
+
+  try {
+    const { data, error } = await supabase
+      .from('orders')
+      .update({ status })
+      .eq('order_id', orderId)
+      .select()
+      .single();
+
+    if (error) throw error;
+    res.json({ success: true, order: data });
+  } catch (err) {
+    console.error('Update order status error:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post(['/api/bookings/status', '/bookings/status'], async (req, res) => {
+  if (!supabase) return res.status(503).json({ error: 'Supabase is not configured.' });
+
+  const { bookingId, status } = req.body || {};
+  const validStatuses = ['confirmed', 'completed', 'cancelled'];
+  if (!bookingId || !validStatuses.includes(status)) {
+    return res.status(400).json({ error: 'Invalid booking status or bookingId' });
+  }
+
+  try {
+    const { data, error } = await supabase
+      .from('bookings')
+      .update({ status })
+      .eq('booking_id', bookingId)
+      .select()
+      .single();
+
+    if (error) throw error;
+    res.json({ success: true, booking: data });
+  } catch (err) {
+    console.error('Update booking status error:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 if (require.main === module) {
   app.listen(port, () => {
     console.log(`Pet Society server listening on http://localhost:${port}`);
