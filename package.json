@@ -4,7 +4,7 @@
   "description": "Pet Society — Luxury Spa & Pet Nutrition",
   "main": "index.html",
   "scripts": {
-    "dev": "serve .",
+    "dev": "node server.js",
     "start": "node server.js"
   },
   "keywords": [
@@ -19,6 +19,7 @@
   "dependencies": {
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
+    "qrcode": "^1.5.4",
     "razorpay": "^2.9.6"
   },
   "devDependencies": {

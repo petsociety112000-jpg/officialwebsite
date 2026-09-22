@@ -259,3 +259,64 @@
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ---- PAYMENT MODAL RESPONSIVE ---- */
+@media (max-width: 640px) {
+  .pay-modal-box {
+    flex-direction: column;
+    max-height: 95vh;
+    border-radius: var(--radius-md);
+  }
+
+  .pay-modal-left {
+    width: 100%;
+    padding: var(--space-4);
+    flex-direction: row;
+    align-items: center;
+    gap: var(--space-4);
+    flex-wrap: wrap;
+  }
+
+  .pay-modal-brand { margin-bottom: 0; flex-shrink: 0; }
+  .pay-modal-price-label { display: none; }
+  .pay-modal-price { font-size: 1.5rem; margin-bottom: 0; }
+  .pay-modal-left-divider,
+  .pay-modal-info-row,
+  .pay-modal-left-bottom { display: none; }
+
+  .pay-modal-right-body {
+    flex-direction: column;
+  }
+
+  .pay-method-sidebar {
+    width: 100%;
+    flex-direction: row;
+    border-right: none;
+    border-bottom: 1px solid var(--color-slate-100);
+    padding: 0;
+    overflow-x: auto;
+  }
+
+  .pay-method-tab {
+    flex-direction: row;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-3);
+    border-left: none;
+    border-bottom: 3px solid transparent;
+    white-space: nowrap;
+    min-width: fit-content;
+  }
+
+  .pay-method-tab small { display: none; }
+
+  .pay-method-tab.active {
+    border-left-color: transparent;
+    border-bottom-color: #1A237E;
+  }
+
+  .pay-upi-split {
+    grid-template-columns: 1fr;
+  }
+
+  .pay-upi-right { display: none; }
+}

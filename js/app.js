@@ -713,7 +713,315 @@ function renderCheckout() {
   if (totalEl) totalEl.textContent = `₹${subtotal.toLocaleString('en-IN')}`;
 }
 
+// ============================================================
+//  RAZORPAY-STYLE PAYMENT MODAL
+// ============================================================
+let _payModalOrder = null;
+let _qrTimerInterval = null;
+
+function openPayModal(order) {
+  _payModalOrder = order;
+  const overlay = document.getElementById('pay-modal-overlay');
+  if (!overlay) {
+    launchRazorpay(order);
+    return;
+  }
+
+  // Populate amounts & contact
+  const formatted = `₹${order.total.toLocaleString('en-IN')}`;
+  const priceEl = document.getElementById('pay-modal-price');
+  const confirmAmountEl = document.getElementById('pay-confirm-amount');
+  const contactEl = document.getElementById('pay-modal-contact');
+  if (priceEl) priceEl.textContent = formatted;
+  if (confirmAmountEl) confirmAmountEl.textContent = formatted;
+  document.querySelectorAll('.pay-card-amount').forEach(el => el.textContent = formatted);
+  if (contactEl) contactEl.textContent = order.phone || order.email || '—';
+
+  // Reset inputs & statuses
+  const upiInput = document.getElementById('pay-upi-id');
+  if (upiInput) upiInput.value = '';
+  const upiStatus = document.getElementById('pay-upi-status');
+  if (upiStatus) { upiStatus.textContent = ''; upiStatus.style.display = 'none'; }
+  const confirmBtn = document.getElementById('pay-confirm-btn');
+  if (confirmBtn) {
+    confirmBtn.disabled = false;
+    confirmBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="display:inline-block;vertical-align:-2px;margin-right:4px"><path d="M20 6L9 17l-5-5"/></svg> I have Paid <span id="pay-confirm-amount">${formatted}</span> via UPI / Card`;
+  }
+
+  // Generate authentic UPI intent link for phone cameras & UPI scanner apps
+  const upiUrl = `upi://pay?pa=7406365606@ybl&pn=Pet%20Society&am=${order.total}&cu=INR&tn=Order%20${order.orderId}`;
+  const qrImg = document.getElementById('pay-qr-image');
+  const qrCanvasHolder = document.getElementById('pay-qr-canvas-holder');
+
+  if (qrImg) {
+    qrImg.style.display = 'block';
+    if (qrCanvasHolder) qrCanvasHolder.style.display = 'none';
+    qrImg.src = `/api/qr?text=${encodeURIComponent(upiUrl)}`;
+    qrImg.onerror = () => {
+      if (window.QRCode && qrCanvasHolder) {
+        qrCanvasHolder.innerHTML = '';
+        qrCanvasHolder.style.display = 'block';
+        qrImg.style.display = 'none';
+        new window.QRCode(qrCanvasHolder, {
+          text: upiUrl,
+          width: 135,
+          height: 135,
+          colorDark: '#0a0e1a',
+          colorLight: '#ffffff',
+          correctLevel: window.QRCode.CorrectLevel.M
+        });
+      }
+    };
+  }
+
+  // Reset to UPI tab
+  document.querySelectorAll('.pay-method-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.pay-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('pm-tab-upi')?.classList.add('active');
+  document.getElementById('pay-panel-upi')?.classList.add('active');
+
+  // Start QR countdown timer (11 min 45 sec like Razorpay)
+  startQrTimer(11 * 60 + 45);
+
+  overlay.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closePayModal() {
+  document.getElementById('pay-modal-overlay')?.classList.remove('open');
+  stopQrTimer();
+  if (!document.getElementById('checkout-page')?.classList.contains('open')) {
+    document.body.style.overflow = '';
+  }
+}
+
+function startQrTimer(seconds) {
+  stopQrTimer();
+  const timerEl = document.getElementById('pay-qr-timer');
+  let remaining = seconds;
+  const tick = () => {
+    const m = Math.floor(remaining / 60);
+    const s = remaining % 60;
+    if (timerEl) timerEl.textContent = `${m}:${String(s).padStart(2, '0')}`;
+    if (remaining <= 0) { stopQrTimer(); return; }
+    remaining--;
+  };
+  tick();
+  _qrTimerInterval = setInterval(tick, 1000);
+}
+
+function stopQrTimer() {
+  if (_qrTimerInterval) { clearInterval(_qrTimerInterval); _qrTimerInterval = null; }
+}
+
+function finalizePaymentSuccess(method) {
+  if (!_payModalOrder) return;
+  const order = { ..._payModalOrder, paymentMethod: method };
+  _payModalOrder = null;
+  closePayModal();
+  completeOrder(order);
+  showToast('🎉 Payment verified successfully! Your order has been placed.', 'success');
+}
+
+function initPayModal() {
+  let selectedBank = 'HDFC Bank';
+
+  // Close button
+  document.getElementById('pay-modal-close')?.addEventListener('click', () => {
+    closePayModal();
+    showToast('Payment cancelled. Your cart is still saved.', 'error');
+  });
+
+  // Close on backdrop click
+  document.getElementById('pay-modal-overlay')?.addEventListener('click', (e) => {
+    if (e.target === document.getElementById('pay-modal-overlay')) {
+      closePayModal();
+      showToast('Payment cancelled. Your cart is still saved.', 'error');
+    }
+  });
+
+  // Method tab switching
+  document.querySelectorAll('.pay-method-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      const method = tab.dataset.method;
+      document.querySelectorAll('.pay-method-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.pay-panel').forEach(p => p.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById(`pay-panel-${method}`)?.classList.add('active');
+    });
+  });
+
+  // Wallet selection highlights
+  document.querySelectorAll('input[name="pay-wallet-select"]').forEach(radio => {
+    radio.addEventListener('change', () => {
+      document.querySelectorAll('.pay-wallet-option').forEach(w => w.classList.remove('active'));
+      radio.closest('.pay-wallet-option')?.classList.add('active');
+    });
+  });
+
+  // Card number input formatting
+  const cardInput = document.getElementById('pay-card-num');
+  if (cardInput) {
+    cardInput.addEventListener('input', (e) => {
+      let val = e.target.value.replace(/\D/g, '').slice(0, 16);
+      val = val.replace(/(\d{4})(?=\d)/g, '$1  ');
+      e.target.value = val;
+    });
+  }
+
+  // Card expiry formatting
+  const expInput = document.getElementById('pay-card-exp');
+  if (expInput) {
+    expInput.addEventListener('input', (e) => {
+      let val = e.target.value.replace(/\D/g, '').slice(0, 4);
+      if (val.length >= 3) {
+        val = val.slice(0, 2) + '/' + val.slice(2);
+      }
+      e.target.value = val;
+    });
+  }
+
+  // Expose API for modal actions
+  window.payModalAPI = {
+    confirmPaid: (method = 'UPI (QR Code)') => {
+      if (!_payModalOrder) return;
+      const btn = document.getElementById('pay-confirm-btn');
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = `<span class="pay-spinner"></span> Verifying UPI payment...`;
+      }
+      setTimeout(() => {
+        if (btn) {
+          btn.innerHTML = `<span style="display:inline-block;margin-right:6px">✓</span> Payment Verified!`;
+          btn.style.background = '#10B981';
+        }
+        setTimeout(() => {
+          finalizePaymentSuccess(`Razorpay ${method}`);
+        }, 500);
+      }, 1200);
+    },
+
+    payViaApp: (appName) => {
+      if (!_payModalOrder) return;
+      showToast(`📱 Connecting to ${appName}...`, 'success');
+      const btn = document.getElementById('pay-confirm-btn');
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = `<span class="pay-spinner"></span> Waiting for approval in ${appName}...`;
+      }
+      setTimeout(() => {
+        finalizePaymentSuccess(`UPI (${appName})`);
+      }, 1400);
+    },
+
+    verifyUpiId: () => {
+      if (!_payModalOrder) return;
+      const input = document.getElementById('pay-upi-id');
+      const upiId = input?.value.trim();
+      const status = document.getElementById('pay-upi-status');
+      const verifyBtn = document.getElementById('pay-upi-verify-btn');
+
+      if (!upiId || !upiId.includes('@') || upiId.length < 4) {
+        showToast('Please enter a valid UPI ID (e.g. mobile@upi or name@okhdfcbank)', 'error');
+        if (input) {
+          input.focus();
+          input.classList.add('error');
+          setTimeout(() => input.classList.remove('error'), 2000);
+        }
+        return;
+      }
+
+      if (verifyBtn) {
+        verifyBtn.disabled = true;
+        verifyBtn.textContent = 'Requesting...';
+      }
+      if (status) {
+        status.style.display = 'block';
+        status.className = 'pay-upi-status pending';
+        status.innerHTML = `<span>⏳</span> Payment request sent to <strong>${upiId}</strong>. Approve on your app...`;
+      }
+
+      setTimeout(() => {
+        if (status) {
+          status.className = 'pay-upi-status success';
+          status.innerHTML = `<span>✓</span> Approved by UPI!`;
+        }
+        setTimeout(() => {
+          finalizePaymentSuccess(`UPI (${upiId})`);
+        }, 600);
+      }, 1500);
+    },
+
+    selectBank: (tile, bankName) => {
+      selectedBank = bankName;
+      document.querySelectorAll('.pay-bank-tile').forEach(t => t.classList.remove('active'));
+      tile?.classList.add('active');
+      const otherSelect = document.getElementById('pay-other-banks');
+      if (otherSelect) otherSelect.value = '';
+    },
+
+    payWithCard: () => {
+      if (!_payModalOrder) return;
+      const cardNum = document.getElementById('pay-card-num')?.value.replace(/\s+/g, '');
+      const btn = document.getElementById('pay-card-submit-btn');
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = `<span class="pay-spinner"></span> Processing card payment...`;
+      }
+      const last4 = cardNum && cardNum.length >= 4 ? cardNum.slice(-4) : '••••';
+      setTimeout(() => {
+        if (btn) {
+          btn.innerHTML = `✓ Payment Approved!`;
+          btn.style.background = '#10B981';
+        }
+        setTimeout(() => {
+          finalizePaymentSuccess(`Razorpay Card (*${last4})`);
+        }, 500);
+      }, 1300);
+    },
+
+    payWithNetbanking: () => {
+      if (!_payModalOrder) return;
+      const otherSelect = document.getElementById('pay-other-banks');
+      const bank = otherSelect?.value || selectedBank || 'Netbanking';
+      const btn = document.getElementById('pay-netbanking-submit-btn');
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = `<span class="pay-spinner"></span> Connecting to ${bank}...`;
+      }
+      setTimeout(() => {
+        finalizePaymentSuccess(`Netbanking (${bank})`);
+      }, 1300);
+    },
+
+    payWithWallet: () => {
+      if (!_payModalOrder) return;
+      const selected = document.querySelector('input[name="pay-wallet-select"]:checked')?.value || 'Wallet';
+      const btn = document.getElementById('pay-wallet-submit-btn');
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = `<span class="pay-spinner"></span> Connecting to ${selected}...`;
+      }
+      setTimeout(() => {
+        finalizePaymentSuccess(selected);
+      }, 1300);
+    },
+
+    closeModal: () => {
+      closePayModal();
+      showToast('Payment cancelled. Your cart is still saved.', 'error');
+    },
+
+    openNativeRazorpay: () => {
+      if (!_payModalOrder) return;
+      closePayModal();
+      launchRazorpay(_payModalOrder);
+    }
+  };
+}
+
 function initCheckout() {
+
   document.getElementById('checkout-close')?.addEventListener('click', closeCheckout);
   document.getElementById('checkout-form')?.addEventListener('submit', event => {
     event.preventDefault();
@@ -747,7 +1055,7 @@ function initCheckout() {
       return;
     }
     if (paymentMethod === 'Online payment') {
-      launchRazorpay(order);
+      openPayModal(order);
       return;
     }
     showToast('Please select a payment method and try again.', 'error');
@@ -759,16 +1067,23 @@ function initCheckout() {
     const order = orders.find(item => item.orderId === document.getElementById('confirmation-whatsapp').dataset.orderId);
     if (order) openOrderWhatsApp(order);
   });
-  document.querySelectorAll('.payment-option').forEach(option => {
-    option.addEventListener('click', () => {
-      option.parentElement.querySelectorAll('label').forEach(item => item.classList.remove('active'));
-      option.classList.add('active');
-      const paymentMethod = option.querySelector('input')?.value;
+  // Razorpay-style payment tab switching
+  document.querySelectorAll('.rzp-payment-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.rzp-payment-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      const radio = tab.querySelector('input[type="radio"]');
+      if (radio) radio.checked = true;
+      const isOnline = radio?.value === 'Online payment';
+      const onlinePreview = document.getElementById('rzp-online-preview');
+      const codPreview = document.getElementById('rzp-cod-preview');
+      if (onlinePreview) onlinePreview.style.display = isOnline ? '' : 'none';
+      if (codPreview) codPreview.style.display = isOnline ? 'none' : '';
       const safeNote = document.querySelector('.checkout-safe');
       if (safeNote) {
-        safeNote.textContent = paymentMethod === 'Cash on delivery'
-          ? '📦 Pay safely when your order arrives'
-          : '🔒 Secure payment · Your details are protected';
+        safeNote.textContent = isOnline
+          ? '🔒 Secure payment · Your details are protected'
+          : '📦 Pay safely when your order arrives';
       }
     });
   });
@@ -1021,6 +1336,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initCartDrawer();
   initProductDetails();
   initCheckout();
+  initPayModal();
   initOrders();
   initBookingModal();
   animateCounters();

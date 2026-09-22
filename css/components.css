@@ -2225,6 +2225,1063 @@
 .btn-whatsapp { background: #25D366; color: #fff; }
 .btn-whatsapp:hover { background: #1da851; color: #fff; }
 
+/* ============================================================
+   RAZORPAY-STYLE PAYMENT SELECTOR (in checkout card)
+   ============================================================ */
+.rzp-payment-selector {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+}
+
+.rzp-payment-tab {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border: 1.5px solid var(--color-slate-200);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: var(--transition-base);
+  position: relative;
+  background: var(--color-white);
+  width: 100%;
+  text-align: left;
+}
+
+.rzp-payment-tab input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.rzp-payment-tab.active {
+  border-color: #1E3A8A;
+  background: #EEF2FF;
+}
+
+.rzp-payment-tab:hover:not(.active) {
+  border-color: var(--color-slate-300);
+  background: var(--color-slate-50);
+}
+
+.rzp-tab-icon {
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-md);
+  background: #DBEAFE;
+  color: #1E3A8A;
+  flex-shrink: 0;
+}
+
+.rzp-tab-icon--cod {
+  background: #D1FAE5;
+  color: #065F46;
+}
+
+.rzp-payment-tab.active:last-child .rzp-tab-icon {
+  background: #D1FAE5;
+  color: #065F46;
+}
+
+.rzp-tab-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.rzp-tab-content strong {
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  color: var(--color-slate-800);
+}
+
+.rzp-tab-content small {
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+}
+
+.rzp-tab-badge {
+  font-size: 0.65rem;
+  font-weight: var(--font-bold);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  background: #1E3A8A;
+  color: #fff;
+  padding: 2px 7px;
+  border-radius: var(--radius-full);
+  flex-shrink: 0;
+}
+
+/* Online preview panel */
+.rzp-online-preview {
+  border: 1px solid var(--color-slate-200);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-off-white);
+  margin-bottom: var(--space-3);
+}
+
+.rzp-methods-row {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  margin-bottom: var(--space-3);
+}
+
+.rzp-method-chip {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border: 1px solid var(--color-slate-200);
+  border-radius: var(--radius-full);
+  font-size: var(--text-xs);
+  font-weight: var(--font-semibold);
+  color: var(--color-slate-600);
+  background: var(--color-white);
+  cursor: pointer;
+  transition: var(--transition-color);
+}
+
+.rzp-method-chip--active {
+  border-color: #1E3A8A;
+  color: #1E3A8A;
+  background: #EEF2FF;
+}
+
+.rzp-upi-preview {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.rzp-upi-apps {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.rzp-upi-app {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.6rem;
+  font-weight: var(--font-bold);
+  box-shadow: var(--shadow-xs);
+}
+
+.rzp-upi-app--gpay { background: #fff; border: 1px solid #e0e0e0; color: #4285F4; font-size: 0.55rem; }
+.rzp-upi-app--phonepe { background: #5f259f; color: #fff; }
+.rzp-upi-app--paytm { background: #00BAF2; color: #fff; }
+.rzp-upi-app--bhim { background: #002970; color: #fff; }
+
+.rzp-upi-hint {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+}
+
+.rzp-cashback-strip {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  background: #FFFBEB;
+  border: 1px solid #FCD34D;
+  border-radius: var(--radius-md);
+  font-size: var(--text-xs);
+  color: #92400E;
+}
+
+.rzp-cashback-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #F59E0B;
+  flex-shrink: 0;
+}
+
+/* COD preview */
+.rzp-cod-preview {
+  border: 1px solid #A7F3D0;
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+  background: #ECFDF5;
+  margin-bottom: var(--space-3);
+}
+
+.rzp-cod-info {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+}
+
+.rzp-cod-icon {
+  font-size: 1.8rem;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.rzp-cod-info strong {
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  color: #065F46;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.rzp-cod-info p {
+  font-size: var(--text-xs);
+  color: #047857;
+  line-height: 1.5;
+  margin: 0;
+}
+
+
+/* ============================================================
+   RAZORPAY PAYMENT MODAL (full split-panel overlay)
+   ============================================================ */
+.pay-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: calc(var(--z-modal) + 5);
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-4);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--duration-base) var(--ease-out);
+}
+
+.pay-modal-overlay.open {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.pay-modal-box {
+  display: flex;
+  width: min(760px, 100%);
+  max-height: 90vh;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: 0 32px 80px rgba(0,0,0,0.35), 0 12px 30px rgba(0,0,0,0.2);
+  transform: scale(0.96) translateY(12px);
+  transition: transform var(--duration-base) var(--ease-out);
+}
+
+.pay-modal-overlay.open .pay-modal-box {
+  transform: scale(1) translateY(0);
+}
+
+/* ---- LEFT PANEL ---- */
+.pay-modal-left {
+  width: 220px;
+  flex-shrink: 0;
+  background: linear-gradient(160deg, #1A237E 0%, #283593 50%, #1565C0 100%);
+  padding: var(--space-6) var(--space-5);
+  display: flex;
+  flex-direction: column;
+  color: rgba(255,255,255,0.9);
+  position: relative;
+  overflow: hidden;
+}
+
+.pay-modal-left::before {
+  content: '';
+  position: absolute;
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.04);
+  top: -60px;
+  right: -60px;
+  pointer-events: none;
+}
+
+.pay-modal-left::after {
+  content: '';
+  position: absolute;
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.03);
+  bottom: -40px;
+  left: -40px;
+  pointer-events: none;
+}
+
+.pay-modal-brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-5);
+}
+
+.pay-modal-brand-logo {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  background: rgba(255,255,255,0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.2);
+}
+
+.pay-modal-brand-initial {
+  font-size: 1.3rem;
+  font-weight: var(--font-extrabold);
+  color: #fff;
+}
+
+.pay-modal-brand-name {
+  font-size: var(--text-sm);
+  font-weight: var(--font-bold);
+  color: #fff;
+  line-height: 1.2;
+}
+
+.pay-modal-brand-verified {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 0.58rem;
+  font-weight: var(--font-bold);
+  letter-spacing: 0.05em;
+  color: #86EFAC;
+  margin-top: 2px;
+}
+
+.pay-modal-price-label {
+  font-size: 0.6rem;
+  font-weight: var(--font-bold);
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.55);
+  margin-bottom: var(--space-1);
+}
+
+.pay-modal-price {
+  font-size: 2rem;
+  font-weight: var(--font-extrabold);
+  color: #fff;
+  line-height: 1;
+  margin-bottom: var(--space-4);
+  letter-spacing: -0.02em;
+}
+
+.pay-modal-left-pills {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: var(--space-1);
+}
+
+.pay-modal-pill-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(255, 255, 255, 0.09);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: var(--radius-sm);
+  padding: 6px 8px;
+  font-size: 0.68rem;
+  color: rgba(255, 255, 255, 0.9);
+  cursor: pointer;
+  transition: var(--transition-base);
+}
+
+.pay-modal-pill-row:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.pay-modal-pill-text {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.pay-modal-pill-text span {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.pay-modal-pill-text strong {
+  color: #fff;
+}
+
+.pay-modal-pill-arrow {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.9rem;
+  line-height: 1;
+}
+
+.pay-tag-icon {
+  font-size: 0.75rem;
+}
+
+.pay-modal-left-bottom {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.58rem;
+  color: rgba(255,255,255,0.6);
+  padding-top: var(--space-3);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.pay-modal-rzp-shield {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.pay-modal-rzp-shield strong {
+  color: #fff;
+  font-weight: var(--font-bold);
+}
+
+.pay-modal-ssl-badge {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.55rem;
+}
+
+/* ---- RIGHT PANEL ---- */
+.pay-modal-right {
+  flex: 1;
+  background: var(--color-white);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+}
+
+.pay-modal-close {
+  position: absolute;
+  top: var(--space-3);
+  right: var(--space-3);
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--color-slate-100);
+  color: var(--color-slate-500);
+  font-size: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition-base);
+  z-index: 1;
+  cursor: pointer;
+}
+
+.pay-modal-close:hover {
+  background: var(--color-slate-200);
+  color: var(--color-slate-800);
+}
+
+.pay-modal-right-title {
+  font-size: var(--text-base);
+  font-weight: var(--font-bold);
+  color: var(--color-slate-800);
+  padding: var(--space-4) var(--space-5) var(--space-3);
+  border-bottom: 1px solid var(--color-slate-100);
+  flex-shrink: 0;
+}
+
+.pay-modal-right-body {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* Method sidebar tabs */
+.pay-method-sidebar {
+  width: 130px;
+  flex-shrink: 0;
+  border-right: 1px solid var(--color-slate-100);
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-2) 0;
+  overflow-y: auto;
+}
+
+.pay-method-tab {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  padding: var(--space-3) var(--space-3);
+  font-size: var(--text-xs);
+  font-weight: var(--font-semibold);
+  color: var(--color-slate-600);
+  border-left: 3px solid transparent;
+  transition: var(--transition-color);
+  cursor: pointer;
+  text-align: left;
+  background: transparent;
+  width: 100%;
+}
+
+.pay-method-tab svg {
+  margin-bottom: 2px;
+  color: var(--color-slate-400);
+}
+
+.pay-method-tab span {
+  display: block;
+}
+
+.pay-method-tab small {
+  font-size: 0.6rem;
+  color: var(--text-muted);
+  font-weight: var(--font-regular);
+}
+
+.pay-method-tab:hover {
+  background: var(--color-slate-50);
+  color: var(--color-slate-800);
+}
+
+.pay-method-tab.active {
+  border-left-color: #1A237E;
+  background: #F0F4FF;
+  color: #1A237E;
+}
+
+.pay-method-tab.active svg {
+  color: #1A237E;
+}
+
+/* Payment panels */
+.pay-panel {
+  display: none;
+  flex: 1;
+  flex-direction: column;
+  padding: var(--space-3) var(--space-4);
+  overflow-y: auto;
+}
+
+.pay-panel.active {
+  display: flex;
+}
+
+/* Cashback strip */
+.pay-panel-cashback {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  background: #FEF9C3;
+  border: 1px solid #FCD34D;
+  border-radius: var(--radius-md);
+  font-size: var(--text-xs);
+  color: #92400E;
+  margin-bottom: var(--space-3);
+  flex-shrink: 0;
+}
+
+.cashback-star { color: #F59E0B; }
+.cashback-view {
+  margin-left: auto;
+  font-weight: var(--font-semibold);
+  color: #1D4ED8;
+  font-size: var(--text-xs);
+}
+
+/* UPI split layout */
+.pay-upi-split {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--space-4);
+  flex: 1;
+  min-height: 0;
+}
+
+/* UPI left column */
+.pay-upi-left {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.pay-upi-apps-label {
+  font-size: var(--text-xs);
+  font-weight: var(--font-semibold);
+  color: var(--color-slate-500);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide);
+}
+
+.pay-upi-apps-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-2);
+}
+
+.pay-upi-app-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  transition: var(--transition-transform);
+  background: transparent;
+}
+
+.pay-upi-app-btn:hover { transform: translateY(-2px); }
+
+.pay-upi-app-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.6rem;
+  font-weight: var(--font-extrabold);
+  box-shadow: var(--shadow-xs);
+  border: 1px solid rgba(0,0,0,0.07);
+}
+
+.pay-upi-app-icon--gpay { background: #fff; color: #4285F4; font-size: 0.55rem; letter-spacing: -1px; }
+.pay-upi-app-icon--phonepe { background: #5f259f; color: #fff; font-size: 0.7rem; }
+.pay-upi-app-icon--paytm { background: #00BAF2; color: #fff; font-size: 0.55rem; }
+.pay-upi-app-icon--bhim { background: #002970; color: #fff; font-size: 0.55rem; }
+
+.pay-upi-app-btn span {
+  font-size: 0.6rem;
+  color: var(--color-slate-600);
+  font-weight: var(--font-medium);
+}
+
+/* UPI ID input */
+.pay-upi-id-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-top: auto;
+}
+
+.pay-upi-id-label {
+  font-size: var(--text-xs);
+  font-weight: var(--font-semibold);
+  color: var(--color-slate-600);
+}
+
+.pay-upi-id-input-wrap {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.pay-upi-id-input {
+  flex: 1;
+  padding: 0.5rem 0.65rem;
+  border: 1px solid var(--color-slate-200);
+  border-radius: var(--radius-md);
+  font: inherit;
+  font-size: var(--text-xs);
+  color: var(--color-slate-800);
+  outline: none;
+  min-width: 0;
+}
+
+.pay-upi-id-input:focus {
+  border-color: #1A237E;
+  box-shadow: 0 0 0 2px rgba(26,35,126,0.12);
+}
+
+.pay-upi-verify-btn {
+  padding: 0.5rem 0.75rem;
+  background: #1A237E;
+  color: #fff;
+  font-size: var(--text-xs);
+  font-weight: var(--font-semibold);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: var(--transition-base);
+}
+
+.pay-upi-verify-btn:hover { background: #283593; }
+
+/* QR right column */
+.pay-upi-right {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  flex-shrink: 0;
+}
+
+.pay-upi-qr-label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: var(--text-xs);
+  font-weight: var(--font-semibold);
+  color: var(--color-slate-700);
+}
+
+.pay-qr-timer {
+  font-size: var(--text-xs);
+  font-weight: var(--font-bold);
+  color: #F59E0B;
+  background: #FFFBEB;
+  border: 1px solid #FCD34D;
+  border-radius: var(--radius-full);
+  padding: 1px 6px;
+  margin-left: 4px;
+}
+
+.pay-qr-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  border: 1px solid var(--color-slate-200);
+  border-radius: var(--radius-md);
+  padding: var(--space-2);
+  background: var(--color-white);
+}
+
+.pay-qr-img {
+  padding: var(--space-1);
+  background: white;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 135px;
+  min-height: 135px;
+}
+
+#pay-qr-image {
+  display: block;
+  width: 135px;
+  height: 135px;
+  border-radius: 4px;
+}
+
+#pay-qr-canvas-holder canvas {
+  display: block;
+  border-radius: 4px;
+}
+
+.pay-qr-hint {
+  font-size: 0.6rem;
+  color: var(--text-muted);
+  text-align: center;
+  margin: 0;
+}
+
+.pay-qr-app-pills {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.pay-qr-pill {
+  font-size: 0.55rem;
+  font-weight: var(--font-bold);
+  padding: 2px 6px;
+  border-radius: var(--radius-full);
+}
+
+.pay-qr-pill--phonepe { background: #EDE7F6; color: #5f259f; }
+.pay-qr-pill--gpay { background: #E8F0FE; color: #4285F4; }
+.pay-qr-pill--paytm { background: #E0F4FF; color: #00BAF2; }
+.pay-qr-pill--cred { background: #18181B; color: #FFFFFF; }
+.pay-qr-pill--bhim { background: #E8EAF6; color: #002970; }
+
+/* Confirm button */
+.pay-confirm-btn {
+  width: 100%;
+  padding: 0.72rem 1rem;
+  background: linear-gradient(135deg, #2563EB, #1D4ED8);
+  color: #fff;
+  font-size: var(--text-xs);
+  font-weight: var(--font-bold);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: var(--transition-base);
+  margin-top: var(--space-3);
+  flex-shrink: 0;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: none;
+}
+
+.pay-confirm-btn:hover {
+  background: linear-gradient(135deg, #1D4ED8, #1E40AF);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 24px rgba(37, 99, 235, 0.35);
+}
+
+.pay-confirm-btn:disabled {
+  opacity: 0.8;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.pay-spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: pay-spin 0.65s linear infinite;
+  vertical-align: middle;
+}
+
+@keyframes pay-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Status message for UPI ID */
+.pay-upi-status {
+  margin-top: 6px;
+  font-size: 0.7rem;
+  padding: 4px 8px;
+  border-radius: 4px;
+  display: none;
+}
+.pay-upi-status.pending {
+  background: #EFF6FF;
+  color: #1D4ED8;
+  display: block;
+}
+.pay-upi-status.success {
+  background: #ECFDF5;
+  color: #059669;
+  font-weight: var(--font-semibold);
+  display: block;
+}
+
+/* Form Styles for Card, Netbanking, Wallets */
+.pay-form-card,
+.pay-netbanking-wrap,
+.pay-wallets-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-2) 0;
+  flex: 1;
+}
+
+.pay-field {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  text-align: left;
+}
+
+.pay-field-label {
+  font-size: 0.65rem;
+  font-weight: var(--font-semibold);
+  color: var(--color-slate-600);
+}
+
+.pay-field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2);
+}
+
+.pay-input {
+  width: 100%;
+  padding: 0.45rem 0.65rem;
+  font-size: var(--text-xs);
+  border: 1px solid var(--color-slate-200);
+  border-radius: var(--radius-sm);
+  background: #fff;
+  color: var(--color-slate-800);
+  outline: none;
+  transition: var(--transition-base);
+}
+
+.pay-input:focus {
+  border-color: #2563EB;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
+}
+
+.pay-input-icon-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.pay-card-brand-badge {
+  position: absolute;
+  right: 8px;
+  font-size: 0.6rem;
+  font-weight: var(--font-extrabold);
+  color: #1A365D;
+  background: #EDF2F7;
+  padding: 1px 5px;
+  border-radius: 3px;
+  letter-spacing: 0.05em;
+}
+
+/* Netbanking Bank Tiles */
+.pay-banks-label {
+  font-size: 0.65rem;
+  font-weight: var(--font-semibold);
+  color: var(--color-slate-600);
+  text-align: left;
+}
+
+.pay-banks-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+
+.pay-bank-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 4px;
+  border: 1px solid var(--color-slate-200);
+  border-radius: var(--radius-sm);
+  background: #fff;
+  cursor: pointer;
+  transition: var(--transition-base);
+}
+
+.pay-bank-tile:hover {
+  border-color: #2563EB;
+  background: #F8FAFC;
+}
+
+.pay-bank-tile.active {
+  border-color: #2563EB;
+  background: #EFF6FF;
+  box-shadow: 0 0 0 1px #2563EB;
+}
+
+.pay-bank-logo {
+  font-size: 0.65rem;
+  font-weight: var(--font-extrabold);
+  color: #1E3A8A;
+  margin-bottom: 2px;
+}
+
+.pay-bank-name {
+  font-size: 0.6rem;
+  color: var(--color-slate-600);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+/* Wallets List */
+.pay-wallets-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.pay-wallet-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border: 1px solid var(--color-slate-200);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  background: #fff;
+  transition: var(--transition-base);
+}
+
+.pay-wallet-option:hover {
+  border-color: #2563EB;
+}
+
+.pay-wallet-option.active {
+  border-color: #2563EB;
+  background: #EFF6FF;
+}
+
+.pay-wallet-logo {
+  font-size: 0.6rem;
+  font-weight: var(--font-bold);
+  padding: 3px 6px;
+  border-radius: 4px;
+  min-width: 44px;
+  text-align: center;
+}
+
+.pay-wallet-info {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+.pay-wallet-info strong {
+  font-size: var(--text-xs);
+  color: var(--color-slate-800);
+}
+
+.pay-wallet-info small {
+  font-size: 0.6rem;
+  color: var(--color-slate-500);
+}
+
+/* Modal footer */
+.pay-modal-footer {
+  border-top: 1px solid var(--color-slate-100);
+  padding: var(--space-2) var(--space-4);
+  font-size: 0.6rem;
+  color: var(--text-muted);
+  flex-shrink: 0;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: center;
+}
+
+.pay-modal-footer a {
+  color: #1D4ED8;
+  text-decoration: underline;
+}
+
+.pay-standard-rzp-link {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 0.58rem;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0;
+}
+
+.pay-standard-rzp-link:hover {
+  color: #1D4ED8;
+}
+
 /* Orders history */
 #orders-page { position: fixed; inset: 0; z-index: calc(var(--z-modal) + 1); overflow-y: auto; background: #f8fafc; opacity: 0; pointer-events: none; transform: translateY(16px); transition: opacity var(--duration-base) var(--ease-out), transform var(--duration-base) var(--ease-out); }
 #orders-page.open { opacity: 1; pointer-events: all; transform: translateY(0); }

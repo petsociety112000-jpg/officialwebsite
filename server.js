@@ -4,6 +4,7 @@ const crypto = require('node:crypto');
 const path = require('node:path');
 const express = require('express');
 const Razorpay = require('razorpay');
+const QRCode = require('qrcode');
 
 const app = express();
 const port = Number(process.env.PORT || 3000);
@@ -30,6 +31,28 @@ const razorpay = razorpayKeyId && razorpayKeySecret
 
 app.use(express.json({ limit: '32kb' }));
 app.use(express.static(path.join(__dirname)));
+
+app.get('/api/qr', async (req, res) => {
+  const text = req.query.text;
+  if (!text) {
+    res.status(400).send('Missing text query parameter');
+    return;
+  }
+  try {
+    const svg = await QRCode.toString(text, {
+      type: 'svg',
+      margin: 1,
+      width: 150,
+      color: { dark: '#0a0e1a', light: '#ffffff' }
+    });
+    res.setHeader('Content-Type', 'image/svg+xml');
+    res.setHeader('Cache-Control', 'public, max-age=86400');
+    res.send(svg);
+  } catch (error) {
+    console.error('QR code generation error:', error);
+    res.status(500).send('Error generating QR code');
+  }
+});
 
 function getOrderTotal(items) {
   if (!Array.isArray(items) || items.length === 0 || items.length > 50) {
