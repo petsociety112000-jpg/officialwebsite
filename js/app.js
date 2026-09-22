@@ -1099,10 +1099,12 @@ function initCheckout() {
       const radio = tab.querySelector('input[type="radio"]');
       if (radio) radio.checked = true;
       const isOnline = radio?.value === 'Online payment';
-      const onlinePreview = document.getElementById('rzp-online-preview');
       const codPreview = document.getElementById('rzp-cod-preview');
-      if (onlinePreview) onlinePreview.style.display = isOnline ? '' : 'none';
       if (codPreview) codPreview.style.display = isOnline ? 'none' : '';
+      const placeBtn = document.querySelector('.place-order-btn');
+      if (placeBtn) {
+        placeBtn.innerHTML = isOnline ? 'Proceed to Payment <span>→</span>' : 'Place Order (Cash on Delivery) <span>→</span>';
+      }
       const safeNote = document.querySelector('.checkout-safe');
       if (safeNote) {
         safeNote.textContent = isOnline
