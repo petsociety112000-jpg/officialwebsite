@@ -513,7 +513,7 @@
     }
 
     .status-select {
-      background: rgba(255, 255, 255, 0.05);
+      background: #1e293b;
       border: 1px solid var(--border-color);
       color: #fff;
       padding: 5px 8px;
@@ -522,6 +522,111 @@
       font-weight: 600;
       cursor: pointer;
       outline: none;
+      color-scheme: dark;
+    }
+
+    .filter-select {
+      background: #111a2e;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #f1f5f9;
+      padding: 0.55rem 0.85rem;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      outline: none;
+      color-scheme: dark;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .filter-select:focus {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.25);
+    }
+
+    .status-select option,
+    .filter-select option {
+      background-color: #0f172a;
+      color: #f1f5f9;
+      padding: 8px 12px;
+    }
+
+    /* Custom Date Range Container */
+    .custom-date-container {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: #111a2e;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      padding: 0.3rem 0.65rem;
+      border-radius: 8px;
+      animation: fadeIn 0.2s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-3px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .date-field {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .date-label {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .date-input {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #f1f5f9;
+      color-scheme: dark;
+      padding: 0.35rem 0.55rem;
+      border-radius: 6px;
+      font-size: 0.78rem;
+      font-family: inherit;
+      outline: none;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    .date-input:focus {
+      border-color: #3b82f6;
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .date-arrow {
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      user-select: none;
+    }
+
+    .btn-date-clear {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-muted);
+      border: none;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      font-size: 0.75rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      padding: 0;
+      line-height: 1;
+    }
+
+    .btn-date-clear:hover {
+      background: rgba(239, 68, 68, 0.2);
+      color: #ef4444;
     }
 
     .status-select.confirmed { border-color: #3B82F6; color: #60A5FA; }
@@ -586,6 +691,9 @@
       .stat-value { font-size: 1.5rem; }
       .search-box { min-width: 100%; }
       .controls-bar { flex-direction: column; align-items: stretch; }
+      .search-filter-wrap { width: 100%; }
+      .filter-select { width: 100%; }
+      .custom-date-container { width: 100%; justify-content: space-between; }
     }
   </style>
 </head>
@@ -706,10 +814,26 @@
           <span class="search-icon">🔍</span>
           <input type="text" id="search-input" placeholder="Search customer, phone, order ID...">
         </div>
-        <select id="time-filter" class="status-select" style="padding: 0.55rem 0.85rem;">
+        <select id="time-filter" class="filter-select">
+          <option value="all" selected>🗓️ All Time</option>
           <option value="today">📅 Today Only</option>
-          <option value="all">🗓️ All Time</option>
+          <option value="7days">⚡ Last 7 Days</option>
+          <option value="this_month">📆 This Month</option>
+          <option value="prev_month">⏮️ Previous Month</option>
+          <option value="custom">📅 Custom Range...</option>
         </select>
+        <div id="custom-date-container" class="custom-date-container" style="display: none;">
+          <div class="date-field">
+            <span class="date-label">From</span>
+            <input type="date" id="custom-start-date" class="date-input" title="Start Date">
+          </div>
+          <span class="date-arrow">→</span>
+          <div class="date-field">
+            <span class="date-label">To</span>
+            <input type="date" id="custom-end-date" class="date-input" title="End Date">
+          </div>
+          <button type="button" id="custom-date-clear" class="btn-date-clear" title="Reset date range">✕</button>
+        </div>
       </div>
     </div>
 
@@ -872,11 +996,55 @@
 
     function getLocalDateString(dInput) {
       if (!dInput) return '';
+      if (typeof dInput === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(dInput)) {
+        return dInput;
+      }
       const d = new Date(dInput);
+      if (isNaN(d.getTime())) return '';
       const year = d.getFullYear();
       const month = String(d.getMonth() + 1).padStart(2, '0');
       const day = String(d.getDate()).padStart(2, '0');
       return `${year}-${month}-${day}`;
+    }
+
+    function matchesDateFilter(dateStr, filterValue) {
+      if (!dateStr || filterValue === 'all') return true;
+
+      const now = new Date();
+      const todayStr = getLocalDateString(now);
+
+      if (filterValue === 'today') {
+        return dateStr === todayStr;
+      }
+
+      if (filterValue === '7days') {
+        const past7 = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 6);
+        const startStr = getLocalDateString(past7);
+        return dateStr >= startStr && dateStr <= todayStr;
+      }
+
+      if (filterValue === 'this_month') {
+        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+        const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+        return dateStr >= getLocalDateString(startOfMonth) && dateStr <= getLocalDateString(endOfMonth);
+      }
+
+      if (filterValue === 'prev_month') {
+        const startOfPrev = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+        const endOfPrev = new Date(today.getFullYear(), today.getMonth(), 0);
+        return dateStr >= getLocalDateString(startOfPrev) && dateStr <= getLocalDateString(endOfPrev);
+      }
+
+      if (filterValue === 'custom') {
+        const startInput = document.getElementById('custom-start-date')?.value;
+        const endInput = document.getElementById('custom-end-date')?.value;
+
+        if (startInput && dateStr < startInput) return false;
+        if (endInput && dateStr > endInput) return false;
+        return true;
+      }
+
+      return true;
     }
 
     // ---- RENDER ORDERS TABLE -----------------------------------
@@ -885,13 +1053,10 @@
       const timeFilter = document.getElementById('time-filter').value;
       const search = document.getElementById('search-input').value.toLowerCase().trim();
 
-      const todayStr = getLocalDateString(new Date());
-
       let filtered = _orders.filter(order => {
-        if (timeFilter === 'today') {
-          const orderDate = getLocalDateString(order.created_at);
-          if (orderDate !== todayStr) return false;
-        }
+        const orderDate = getLocalDateString(order.created_at);
+        if (!matchesDateFilter(orderDate, timeFilter)) return false;
+
         if (search) {
           const matchId = (order.order_id || '').toLowerCase().includes(search);
           const matchName = (order.customer_name || '').toLowerCase().includes(search);
@@ -900,6 +1065,8 @@
         }
         return true;
       });
+
+      document.getElementById('count-orders').textContent = filtered.length;
 
       if (!filtered.length) {
         tbody.innerHTML = `
@@ -974,10 +1141,10 @@
       const timeFilter = document.getElementById('time-filter').value;
       const search = document.getElementById('search-input').value.toLowerCase().trim();
 
-      const todayStr = getLocalDateString(new Date());
-
       let filtered = _bookings.filter(b => {
-        if (timeFilter === 'today' && b.booking_date !== todayStr) return false;
+        const bookingDate = b.booking_date || getLocalDateString(b.created_at);
+        if (!matchesDateFilter(bookingDate, timeFilter)) return false;
+
         if (search) {
           const matchPet = (b.pet_name || '').toLowerCase().includes(search);
           const matchOwner = (b.owner_name || '').toLowerCase().includes(search);
@@ -986,6 +1153,8 @@
         }
         return true;
       });
+
+      document.getElementById('count-bookings').textContent = filtered.length;
 
       if (!filtered.length) {
         tbody.innerHTML = `
@@ -1079,19 +1248,63 @@
 
           document.getElementById('orders-view').style.display = _activeTab === 'orders' ? 'block' : 'none';
           document.getElementById('bookings-view').style.display = _activeTab === 'bookings' ? 'block' : 'none';
+
+          if (_activeTab === 'orders') renderOrders();
+          else renderBookings();
         });
       });
     }
 
     function setupSearch() {
-      document.getElementById('search-input')?.addEventListener('input', () => {
+      const searchInput = document.getElementById('search-input');
+      const timeFilter = document.getElementById('time-filter');
+      const customDateWrap = document.getElementById('custom-date-container');
+      const customStartDate = document.getElementById('custom-start-date');
+      const customEndDate = document.getElementById('custom-end-date');
+      const clearCustomBtn = document.getElementById('custom-date-clear');
+
+      const triggerRender = () => {
         if (_activeTab === 'orders') renderOrders();
         else renderBookings();
+      };
+
+      searchInput?.addEventListener('input', triggerRender);
+
+      timeFilter?.addEventListener('change', () => {
+        if (timeFilter.value === 'custom') {
+          customDateWrap.style.display = 'inline-flex';
+          const now = new Date();
+          if (!customEndDate.value) {
+            customEndDate.value = getLocalDateString(now);
+          }
+          if (!customStartDate.value) {
+            const past7 = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 6);
+            customStartDate.value = getLocalDateString(past7);
+          }
+        } else {
+          customDateWrap.style.display = 'none';
+        }
+        triggerRender();
       });
 
-      document.getElementById('time-filter')?.addEventListener('change', () => {
-        if (_activeTab === 'orders') renderOrders();
-        else renderBookings();
+      customStartDate?.addEventListener('change', () => {
+        if (customStartDate.value && customEndDate.value && customStartDate.value > customEndDate.value) {
+          customEndDate.value = customStartDate.value;
+        }
+        triggerRender();
+      });
+
+      customEndDate?.addEventListener('change', () => {
+        if (customStartDate.value && customEndDate.value && customEndDate.value < customStartDate.value) {
+          customStartDate.value = customEndDate.value;
+        }
+        triggerRender();
+      });
+
+      clearCustomBtn?.addEventListener('click', () => {
+        customStartDate.value = '';
+        customEndDate.value = '';
+        triggerRender();
       });
     }
 
